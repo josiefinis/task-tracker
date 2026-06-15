@@ -7,10 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc --watch"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josiefinis/task-tracker.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+  "bugs": {
+    "url": "https://github.com/josiefinis/task-tracker/issues"
+  },
+  "homepage": "https://github.com/josiefinis/task-tracker#readme",
   "devDependencies": {
     "typescript": "^6.0.3"
   }

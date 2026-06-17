@@ -15,11 +15,9 @@ const completionRate: number = completedTasks / totalTasks * 100;
 console.log(`
 Task Summary
 ------------------------------------------
-\t\tPriority\tTask
-------------------------------------------
-${task1.isCompleted ? "[x]": "[ ]"}\t\t${task1.priority}\t\t\t${task1.name} 
-${task2.isCompleted ? "[x]": "[ ]"}\t\t${task2.priority}\t\t\t${task2.name} 
-${task3.isCompleted ? "[x]": "[ ]"}\t\t${task3.priority}\t\t\t${task3.name} 
+${task1.isCompleted ? "[x]": "[ ]"}    !${task1.priority}    ${task1.name} 
+${task2.isCompleted ? "[x]": "[ ]"}    !${task2.priority}    ${task2.name} 
+${task3.isCompleted ? "[x]": "[ ]"}    !${task3.priority}    ${task3.name} 
 
 You have completed ${completionRate.toFixed(0)}% of your tasks.
 `);

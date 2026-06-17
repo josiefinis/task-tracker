@@ -4,20 +4,30 @@ interface Task {
   isCompleted: boolean;
 }
 
-const task1: Task = {name: "make dinner", priority: 5, isCompleted: false };
-const task2: Task = {name: "do laundry", priority: 3, isCompleted: false };
-const task3: Task = {name: "water plants", priority: 4, isCompleted: true };
+const tasks: Task[] = [];
 
-const completedTasks: number = 1;
-const totalTasks: number = 3;
-const completionRate: number = completedTasks / totalTasks * 100;
+tasks.push({ name: "make dinner", priority: 5, isCompleted: false });
+tasks.push({ name: "do laundry", priority: 3, isCompleted: false });
+tasks.push({ name: "water plants", priority: 4, isCompleted: true });
 
 console.log(`
 Task Summary
 ------------------------------------------
-${task1.isCompleted ? "[x]": "[ ]"}    !${task1.priority}    ${task1.name} 
-${task2.isCompleted ? "[x]": "[ ]"}    !${task2.priority}    ${task2.name} 
-${task3.isCompleted ? "[x]": "[ ]"}    !${task3.priority}    ${task3.name} 
-
-You have completed ${completionRate.toFixed(0)}% of your tasks.
 `);
+
+for (let i = 0; i < tasks.length; i++) {
+  const task: Task | undefined = tasks[i];
+  if (typeof task !== "undefined") {
+    console.log(
+      `${i + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}`,
+    );
+  }
+}
+
+const totalTasks: number = tasks.length;
+console.log(`Number of tasks: ${totalTasks}`);
+
+const completedTasks: number = tasks.filter((task) => task.isCompleted).length;
+const completionRate: number = (completedTasks / totalTasks) * 100;
+
+console.log(`You have completed ${completionRate.toFixed(0)}% of your tasks.`);

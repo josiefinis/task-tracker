@@ -15,7 +15,7 @@ Task Summary
 ------------------------------------------
 `);
 
-for (let i = 0; i < tasks.length; i++) {
+for (let i: number = 0; i < tasks.length; i++) {
   const task: Task | undefined = tasks[i];
   if (typeof task !== "undefined") {
     console.log(

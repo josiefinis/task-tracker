@@ -5,7 +5,7 @@ interface Task {
   isCompleted: boolean;
 }
 
-function printHeader(): void {
+const printHeader = (): void => {
   console.log(`
  ==================================
  
@@ -13,33 +13,30 @@ function printHeader(): void {
  
  ==================================
 `);
-}
+};
 
 const printTasksLength = (tasks: Task[]): void =>
   console.log(`Number of tasks: ${tasks.length}`);
 
 function printTasks(tasks: Task[]): void {
+  let printout = "";
   for (let i: number = 0; i < tasks.length; i++) {
     const task: Task | undefined = tasks[i];
-    if (typeof task !== "undefined") {
-      console.log(
-        `${i + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}`,
-      );
-    }
+    printout = printout.concat(
+      task
+        ? `${i + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}\n`
+        : "",
+    );
   }
+  console.log(printout);
 }
 
-const addTask = (tasks: Task[], name: string, priority: priority): void => {
+const addTask = (tasks: Task[], name: string, priority: priority): number =>
   tasks.push({ name: name, priority: priority, isCompleted: false });
-};
 
 const completeTask = (tasks: Task[], name: string): boolean => {
   const task: Task | undefined = tasks.find((task) => task.name === name);
-  if (typeof task === "undefined") {
-    return false;
-  }
-  task.isCompleted = true;
-  return true;
+  return task ? (task.isCompleted = true) : false;
 };
 
 const tasks: Task[] = [];
@@ -48,12 +45,6 @@ addTask(tasks, "make dinner", 5);
 addTask(tasks, "do laundry", 3);
 addTask(tasks, "water plants", 4);
 completeTask(tasks, "water plants");
-
-/*
-tasks.push({ name: "make dinner", priority: 5, isCompleted: false });
-tasks.push({ name: "do laundry", priority: 3, isCompleted: false });
-tasks.push({ name: "water plants", priority: 4, isCompleted: true });
-*/
 
 printHeader();
 printTasks(tasks);

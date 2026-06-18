@@ -18,18 +18,15 @@ const printHeader = (): void => {
 const printTasksLength = (tasks: Task[]): void =>
   console.log(`Number of tasks: ${tasks.length}`);
 
-function printTasks(tasks: Task[]): void {
-  let printout = "";
-  for (let i: number = 0; i < tasks.length; i++) {
-    const task: Task | undefined = tasks[i];
-    printout = printout.concat(
-      task
-        ? `${i + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}\n`
-        : "",
-    );
-  }
+const printTasks = (tasks: Task[]): void => {
+  const printout: string = tasks
+    .map(
+      (task, index) =>
+        `${index + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}`,
+    )
+    .join("\n");
   console.log(printout);
-}
+};
 
 const addTask = (tasks: Task[], name: string, priority: priority): number =>
   tasks.push({ name: name, priority: priority, isCompleted: false });

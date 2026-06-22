@@ -66,7 +66,7 @@ const showTasks = (tasks: Task[]): void => {
   const out: string = tasks
     .map(
       (task, index) =>
-        `${index + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}`,
+        `${index + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}    ${task.notes ? `(${task.notes})` : ""}`,
     )
     .join("\n");
   console.log(out);
@@ -99,7 +99,7 @@ You have completed ${completionRate.toFixed(0)}% of your tasks.
 };
 
 tasks.addTask("make dinner", 5);
-tasks.addTask("do laundry", 3);
+tasks.addTask("do laundry", 3, "lights");
 tasks.addTask("buy paint");
 tasks.addTask("water plants", 4);
 tasks.completeTask("water plants");

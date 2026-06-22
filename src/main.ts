@@ -3,7 +3,51 @@ interface Task {
   name: string;
   priority: priority;
   isCompleted: boolean;
+  notes?: string;
 }
+
+interface TaskList {
+  contents: Task[];
+  length: number;
+  addTask(name: string, priority?: priority, notes?: string): number;
+  completeTask(name: string): boolean;
+  listAll(): Task[];
+  listCompleted(): Task[];
+  listPending(): Task[];
+}
+
+const tasks: TaskList = {
+  contents: [],
+  length: 0,
+
+  addTask(name: string, priority: priority = 1, notes?: string): number {
+    const task: Task = { name: name, priority: priority, isCompleted: false };
+    if (notes) {
+      task.notes = notes;
+    }
+    this.length = this.contents.push(task);
+    return this.length;
+  },
+
+  completeTask(name: string): boolean {
+    const task: Task | undefined = this.contents.find(
+      (task) => task.name === name,
+    );
+    return task ? (task.isCompleted = true) : false;
+  },
+
+  listAll(): Task[] {
+    return this.contents;
+  },
+
+  listCompleted(): Task[] {
+    return this.contents.filter((task) => task.isCompleted);
+  },
+
+  listPending(): Task[] {
+    return this.contents.filter((task) => !task.isCompleted);
+  },
+};
 
 const showHeader = (): void => {
   console.log(`
@@ -15,7 +59,7 @@ const showHeader = (): void => {
 `);
 };
 
-const showTotal = (tasks: Task[]): void =>
+const showTotal = (tasks: TaskList): void =>
   console.log(`Number of tasks: ${tasks.length}`);
 
 const showTasks = (tasks: Task[]): void => {
@@ -28,33 +72,17 @@ const showTasks = (tasks: Task[]): void => {
   console.log(out);
 };
 
-const listCompleted = (tasks: Task[]): Task[] => {
-  return tasks.filter((task) => task.isCompleted);
+const showCompletedTasks = (tasks: TaskList): void => {
+  showTasks(tasks.listCompleted());
 };
 
-const listPending = (tasks: Task[]): Task[] => {
-  return tasks.filter((task) => !task.isCompleted);
+const showPendingTasks = (tasks: TaskList): void => {
+  showTasks(tasks.listPending());
 };
 
-const showCompletedTasks = (tasks: Task[]): void => {
-  showTasks(listCompleted(tasks));
-};
-
-const showPendingTasks = (tasks: Task[]): void => {
-  showTasks(listPending(tasks));
-};
-
-const addTask = (tasks: Task[], name: string, priority: priority = 1): number =>
-  tasks.push({ name: name, priority: priority, isCompleted: false });
-
-const completeTask = (tasks: Task[], name: string): boolean => {
-  const task: Task | undefined = tasks.find((task) => task.name === name);
-  return task ? (task.isCompleted = true) : false;
-};
-
-const showStatistics = (tasks: Task[]): void => {
-  const totalCompleted: number = listCompleted(tasks).length;
-  const totalPending: number = listPending(tasks).length;
+const showStatistics = (tasks: TaskList): void => {
+  const totalCompleted: number = tasks.listCompleted().length;
+  const totalPending: number = tasks.listPending().length;
   const totalTasks: number = tasks.length;
   const completionRate: number = (totalCompleted / totalTasks) * 100;
 
@@ -70,18 +98,17 @@ You have completed ${completionRate.toFixed(0)}% of your tasks.
   );
 };
 
-const tasks: Task[] = [];
-
-addTask(tasks, "make dinner", 5);
-addTask(tasks, "do laundry", 3);
-addTask(tasks, "water plants", 4);
-completeTask(tasks, "water plants");
+tasks.addTask("make dinner", 5);
+tasks.addTask("do laundry", 3);
+tasks.addTask("buy paint");
+tasks.addTask("water plants", 4);
+tasks.completeTask("water plants");
 
 showHeader();
-showTasks(tasks);
+showTasks(tasks.listAll());
 showTotal(tasks);
-addTask(tasks, "buy chives", 5);
-showTasks(tasks);
+tasks.addTask("buy chives", 5);
+showTasks(tasks.listAll());
 showTotal(tasks);
 
 console.log(`

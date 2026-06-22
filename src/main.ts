@@ -5,7 +5,7 @@ interface Task {
   isCompleted: boolean;
 }
 
-const printHeader = (): void => {
+const showHeader = (): void => {
   console.log(`
  ==================================
  
@@ -15,25 +15,59 @@ const printHeader = (): void => {
 `);
 };
 
-const printTotal = (tasks: Task[]): void =>
+const showTotal = (tasks: Task[]): void =>
   console.log(`Number of tasks: ${tasks.length}`);
 
-const printTaskList = (tasks: Task[]): void => {
-  const printout: string = tasks
+const showTasks = (tasks: Task[]): void => {
+  const out: string = tasks
     .map(
       (task, index) =>
         `${index + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}`,
     )
     .join("\n");
-  console.log(printout);
+  console.log(out);
 };
 
-const addTask = (tasks: Task[], name: string, priority: priority): number =>
+const listCompleted = (tasks: Task[]): Task[] => {
+  return tasks.filter((task) => task.isCompleted);
+};
+
+const listPending = (tasks: Task[]): Task[] => {
+  return tasks.filter((task) => !task.isCompleted);
+};
+
+const showCompletedTasks = (tasks: Task[]): void => {
+  showTasks(listCompleted(tasks));
+};
+
+const showPendingTasks = (tasks: Task[]): void => {
+  showTasks(listPending(tasks));
+};
+
+const addTask = (tasks: Task[], name: string, priority: priority = 1): number =>
   tasks.push({ name: name, priority: priority, isCompleted: false });
 
-const setCompleted = (tasks: Task[], name: string): boolean => {
+const completeTask = (tasks: Task[], name: string): boolean => {
   const task: Task | undefined = tasks.find((task) => task.name === name);
   return task ? (task.isCompleted = true) : false;
+};
+
+const showStatistics = (tasks: Task[]): void => {
+  const totalCompleted: number = listCompleted(tasks).length;
+  const totalPending: number = listPending(tasks).length;
+  const totalTasks: number = tasks.length;
+  const completionRate: number = (totalCompleted / totalTasks) * 100;
+
+  console.log(
+    `
+Statistics
+==========
+  ${totalTasks} tasks
+  ${totalPending} pending
+  ${totalCompleted} completed
+You have completed ${completionRate.toFixed(0)}% of your tasks.
+`,
+  );
 };
 
 const tasks: Task[] = [];
@@ -41,16 +75,19 @@ const tasks: Task[] = [];
 addTask(tasks, "make dinner", 5);
 addTask(tasks, "do laundry", 3);
 addTask(tasks, "water plants", 4);
-setCompleted(tasks, "water plants");
+completeTask(tasks, "water plants");
 
-printHeader();
-printTaskList(tasks);
-printTotal(tasks);
+showHeader();
+showTasks(tasks);
+showTotal(tasks);
 addTask(tasks, "buy chives", 5);
-printTaskList(tasks);
-printTotal(tasks);
+showTasks(tasks);
+showTotal(tasks);
 
-const totalCompleted: number = tasks.filter((task) => task.isCompleted).length;
-const completionRate: number = (totalCompleted / tasks.length) * 100;
-
-console.log(`You have completed ${completionRate.toFixed(0)}% of your tasks.`);
+console.log(`
+Completed Tasks`);
+showCompletedTasks(tasks);
+console.log(`
+Pending Tasks`);
+showPendingTasks(tasks);
+showStatistics(tasks);

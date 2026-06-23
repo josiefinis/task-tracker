@@ -3,13 +3,19 @@ interface Task {
   name: string;
   priority: Priority;
   isCompleted: boolean;
+  description?: string;
   notes?: string;
 }
 
 interface TaskList {
   contents: Task[];
   length: number;
-  addTask(name: string, priority?: Priority, notes?: string): number;
+  addTask(
+    name: string,
+    priority?: Priority,
+    description?: string,
+    notes?: string,
+  ): number;
   completeTask(name: string): boolean;
   listAll(): Task[];
   listCompleted(): Task[];
@@ -20,10 +26,18 @@ const tasks: TaskList = {
   contents: [],
   length: 0,
 
-  addTask(name: string, priority: Priority = 1, notes?: string): number {
+  addTask(
+    name: string,
+    priority: Priority = 1,
+    description?: string,
+    notes?: string,
+  ): number {
     const task: Task = { name: name, priority: priority, isCompleted: false };
     if (notes) {
       task.notes = notes;
+    }
+    if (description) {
+      task.description = description;
     }
     this.length = this.contents.push(task);
     return this.length;
@@ -99,7 +113,7 @@ You have completed ${completionRate.toFixed(0)}% of your tasks.
 };
 
 tasks.addTask("make dinner", 5);
-tasks.addTask("do laundry", 3, "lights");
+tasks.addTask("do laundry", 3, "", "lights");
 tasks.addTask("buy paint");
 tasks.addTask("water plants", 4);
 tasks.completeTask("water plants");

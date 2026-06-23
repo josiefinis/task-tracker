@@ -1,7 +1,7 @@
-type priority = 1 | 2 | 3 | 4 | 5;
+type Priority = 1 | 2 | 3 | 4 | 5;
 interface Task {
   name: string;
-  priority: priority;
+  priority: Priority;
   isCompleted: boolean;
   notes?: string;
 }
@@ -9,7 +9,7 @@ interface Task {
 interface TaskList {
   contents: Task[];
   length: number;
-  addTask(name: string, priority?: priority, notes?: string): number;
+  addTask(name: string, priority?: Priority, notes?: string): number;
   completeTask(name: string): boolean;
   listAll(): Task[];
   listCompleted(): Task[];
@@ -20,7 +20,7 @@ const tasks: TaskList = {
   contents: [],
   length: 0,
 
-  addTask(name: string, priority: priority = 1, notes?: string): number {
+  addTask(name: string, priority: Priority = 1, notes?: string): number {
     const task: Task = { name: name, priority: priority, isCompleted: false };
     if (notes) {
       task.notes = notes;

@@ -7,6 +7,8 @@ interface Task {
   status: Status;
   description?: string;
   notes?: string;
+
+  toggleStatus(): Status;
 }
 
 interface TaskList {
@@ -19,11 +21,26 @@ interface TaskList {
     description?: string,
     notes?: string,
   ): number;
-  setStatus(taskName: string, newStatus: Status): Status | undefined;
   toggleStatus(taskName: string): Status | undefined;
   listAll(): Task[];
   listCompleted(): Task[];
   listPending(): Task[];
+}
+
+class Task implements Task {
+  name: string;
+  priority: Priority;
+  status: Status = "pending";
+
+  constructor(name: string, priority: Priority) {
+    this.name = name;
+    this.priority = priority;
+  }
+
+  toggleStatus(): Status {
+    this.status = this.status === "pending" ? "completed" : "pending";
+    return this.status;
+  }
 }
 
 const tasks: TaskList = {
@@ -36,7 +53,7 @@ const tasks: TaskList = {
     description?: string,
     notes?: string,
   ): number {
-    const task: Task = { name: name, priority: priority, status: "pending" };
+    const task: Task = new Task(name, priority);
     if (notes) {
       task.notes = notes;
     }
@@ -47,22 +64,11 @@ const tasks: TaskList = {
     return this.length;
   },
 
-  setStatus(taskName: string, status: Status): Status | undefined {
-    const task: Task | undefined = this.contents.find(
-      (task) => task.name === taskName,
-    );
-    return !task ? undefined : (task.status = status);
-  },
-
   toggleStatus(taskName: string): Status | undefined {
     const task: Task | undefined = this.contents.find(
       (task) => task.name === taskName,
     );
-    return !task
-      ? undefined
-      : task.status !== "completed"
-        ? (task.status = "completed")
-        : (task.status = "pending");
+    return !task ? undefined : task.toggleStatus();
   },
 
   listAll(): Task[] {
@@ -131,7 +137,7 @@ tasks.addTask("make dinner", 5);
 tasks.addTask("do laundry", 3, "", "lights");
 tasks.addTask("buy paint");
 tasks.addTask("water plants", 4);
-tasks.setStatus("water plants", "completed");
+tasks.toggleStatus("water plants");
 
 showHeader();
 showTasks(tasks.listAll());

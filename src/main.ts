@@ -1,8 +1,10 @@
 type Priority = 1 | 2 | 3 | 4 | 5;
+type Status = "pending" | "completed";
+
 interface Task {
   name: string;
   priority: Priority;
-  isCompleted: boolean;
+  status: Status;
   description?: string;
   notes?: string;
 }
@@ -10,13 +12,15 @@ interface Task {
 interface TaskList {
   contents: Task[];
   length: number;
+
   addTask(
     name: string,
     priority?: Priority,
     description?: string,
     notes?: string,
   ): number;
-  completeTask(name: string): boolean;
+  setStatus(taskName: string, newStatus: Status): Status | undefined;
+  toggleStatus(taskName: string): Status | undefined;
   listAll(): Task[];
   listCompleted(): Task[];
   listPending(): Task[];
@@ -32,7 +36,7 @@ const tasks: TaskList = {
     description?: string,
     notes?: string,
   ): number {
-    const task: Task = { name: name, priority: priority, isCompleted: false };
+    const task: Task = { name: name, priority: priority, status: "pending" };
     if (notes) {
       task.notes = notes;
     }
@@ -43,11 +47,22 @@ const tasks: TaskList = {
     return this.length;
   },
 
-  completeTask(name: string): boolean {
+  setStatus(taskName: string, status: Status): Status | undefined {
     const task: Task | undefined = this.contents.find(
-      (task) => task.name === name,
+      (task) => task.name === taskName,
     );
-    return task ? (task.isCompleted = true) : false;
+    return !task ? undefined : (task.status = status);
+  },
+
+  toggleStatus(taskName: string): Status | undefined {
+    const task: Task | undefined = this.contents.find(
+      (task) => task.name === taskName,
+    );
+    return !task
+      ? undefined
+      : task.status !== "completed"
+        ? (task.status = "completed")
+        : (task.status = "pending");
   },
 
   listAll(): Task[] {
@@ -55,11 +70,11 @@ const tasks: TaskList = {
   },
 
   listCompleted(): Task[] {
-    return this.contents.filter((task) => task.isCompleted);
+    return this.contents.filter((task) => task.status === "completed");
   },
 
   listPending(): Task[] {
-    return this.contents.filter((task) => !task.isCompleted);
+    return this.contents.filter((task) => task.status === "pending");
   },
 };
 
@@ -80,7 +95,7 @@ const showTasks = (tasks: Task[]): void => {
   const out: string = tasks
     .map(
       (task, index) =>
-        `${index + 1}. ${task.isCompleted ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}    ${task.notes ? `(${task.notes})` : ""}`,
+        `${index + 1}. ${task.status === "completed" ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}    ${task.notes ? `(${task.notes})` : ""}`,
     )
     .join("\n");
   console.log(out);
@@ -116,7 +131,7 @@ tasks.addTask("make dinner", 5);
 tasks.addTask("do laundry", 3, "", "lights");
 tasks.addTask("buy paint");
 tasks.addTask("water plants", 4);
-tasks.completeTask("water plants");
+tasks.setStatus("water plants", "completed");
 
 showHeader();
 showTasks(tasks.listAll());

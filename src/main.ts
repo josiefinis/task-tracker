@@ -27,7 +27,7 @@ interface TaskList {
   listPending(): Task[];
 }
 
-class Task implements Task {
+class TaskObject implements Task {
   name: string;
   priority: Priority;
   status: Status = "pending";
@@ -53,12 +53,12 @@ const tasks: TaskList = {
     description?: string,
     notes?: string,
   ): number {
-    const task: Task = new Task(name, priority);
-    if (notes) {
-      task.notes = notes;
-    }
+    const task: Task = new TaskObject(name, priority);
     if (description) {
       task.description = description;
+    }
+    if (notes) {
+      task.notes = notes;
     }
     this.length = this.contents.push(task);
     return this.length;
@@ -68,7 +68,7 @@ const tasks: TaskList = {
     const task: Task | undefined = this.contents.find(
       (task) => task.name === taskName,
     );
-    return !task ? undefined : task.toggleStatus();
+    return task ? task.toggleStatus() : undefined;
   },
 
   listAll(): Task[] {
@@ -84,72 +84,50 @@ const tasks: TaskList = {
   },
 };
 
-const showHeader = (): void => {
-  console.log(`
- ==================================
- 
- Task Tracker
- 
- ==================================
-`);
-};
-
-const showTotal = (tasks: TaskList): void =>
-  console.log(`Number of tasks: ${tasks.length}`);
-
-const showTasks = (tasks: Task[]): void => {
-  const out: string = tasks
-    .map(
-      (task, index) =>
-        `${index + 1}. ${task.status === "completed" ? "[x]" : "[ ]"}    !${task.priority}    ${task.name}    ${task.notes ? `(${task.notes})` : ""}`,
-    )
-    .join("\n");
-  console.log(out);
-};
-
-const showCompletedTasks = (tasks: TaskList): void => {
-  showTasks(tasks.listCompleted());
-};
-
-const showPendingTasks = (tasks: TaskList): void => {
-  showTasks(tasks.listPending());
-};
-
-const showStatistics = (tasks: TaskList): void => {
-  const totalCompleted: number = tasks.listCompleted().length;
-  const totalPending: number = tasks.listPending().length;
-  const totalTasks: number = tasks.length;
-  const completionRate: number = (totalCompleted / totalTasks) * 100;
-
-  console.log(
-    `
-Statistics
-==========
-  ${totalTasks} tasks
-  ${totalPending} pending
-  ${totalCompleted} completed
-You have completed ${completionRate.toFixed(0)}% of your tasks.
-`,
-  );
-};
-
 tasks.addTask("make dinner", 5);
 tasks.addTask("do laundry", 3, "", "lights");
 tasks.addTask("buy paint");
 tasks.addTask("water plants", 4);
 tasks.toggleStatus("water plants");
-
-showHeader();
-showTasks(tasks.listAll());
-showTotal(tasks);
 tasks.addTask("buy chives", 5);
-showTasks(tasks.listAll());
-showTotal(tasks);
 
-console.log(`
-Completed Tasks`);
-showCompletedTasks(tasks);
-console.log(`
-Pending Tasks`);
-showPendingTasks(tasks);
-showStatistics(tasks);
+/* Render */
+const app = document.querySelector("#app");
+app?.classList.add("grid");
+
+function appendElement(
+  parent: Element,
+  tagName: string,
+  textContent: string,
+  className?: string,
+) {
+  const element = document.createElement(tagName);
+  element.textContent = textContent;
+  if (className) {
+    element.className = className;
+  }
+  parent.appendChild(element);
+}
+
+function createCard(task: Task): HTMLElement {
+  const card = document.createElement("article");
+  card.classList.add("card");
+  card.classList.add("grid");
+  card.classList.add("container");
+  appendElement(card, "h2", task.name, "card__heading");
+  appendElement(card, "p", `${task.priority}`, "card__priority");
+  appendElement(card, "p", task.status, "card__status");
+  return card;
+}
+
+function renderCards(): void {
+  if (!app) {
+    return;
+  }
+  app.innerHTML = "";
+
+  const cards = tasks.contents.map((task) => createCard(task));
+  cards.forEach((card) => app.appendChild(card));
+}
+
+renderCards();

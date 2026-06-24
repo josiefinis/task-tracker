@@ -1,0 +1,195 @@
+:root {
+  /* Fonts */
+  --static-font-size-xxl: 3rem;
+  --static-font-size-xl: 2rem;
+  --static-font-size-l: 1.5rem;
+  --static-font-size-m: 1rem;
+  --static-font-size-s: 0.8rem;
+
+  --fluid-font-size-xxl: clamp(2rem, 8cqi + 0.5rem, 4rem);
+  --fluid-font-size-xl: clamp(1.2rem, 5cqi + 0.5rem, 2.5rem);
+  --fluid-font-size-l: clamp(0.9rem, 2.2cqi + 0.5rem, 1.5rem);
+  --fluid-font-size-m: clamp(0.8rem, 2cqi + 0.5rem, 1rem);
+  --fluid-font-size-s: clamp(0.7rem, 1cqi + 0.5rem, 1rem);
+
+  --font-weight-bold: 600;
+  --font-weight-bolder: 800;
+
+  /* Neutral Colors */
+  --gray-50: oklch(98.53% 0.0065 250.77);
+  --gray-100: oklch(96.5% 0.01 250);
+  --gray-300: oklch(85.82% 0.0156 254.4);
+  --gray-400: oklch(70.12% 0.019 252.3);
+  --gray-600: oklch(44.51% 0.0304 257.65);
+  --gray-900: oklch(18.23% 0.0298 274.65);
+  --gray-950: oklch(18.23% 0.0298 274.65);
+  --white: oklch(100% 0 0);
+  --black: oklch(0 0 0);
+
+  --clr-subtle-text: light-dark(var(--gray-600), var(--gray-300));
+  --clr-shadow: light-dark(var(--gray-100), var(--black));
+
+  /* Spacing */
+  --spacing: 0.25rem;
+}
+/* ==========================================
+ *  Basic reset & typography
+ * ========================================== 
+ */
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+* {
+  font: inherit;
+}
+
+/* Remove default margin */
+*:not(dialog) {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  object-fit: cover;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+html {
+  color-scheme: dark light;
+}
+
+/* ======================================================================
+ * Global/base styles 
+ * ======================================================================
+ */
+
+body {
+  font-family: sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+  line-height: 1.1;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* ======================================================================
+ * COMPOSITION
+ * ======================================================================
+ */
+
+.container {
+  container-type: inline-size;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--min-column-inline-size, 16rem), 1fr)
+  );
+  gap: var(--grid-gap, 1rem);
+}
+
+.flex {
+  display: flex;
+  gap: var(--flex-gap, 1rem);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--flex-gap, 1rem);
+}
+
+.flow > * + * {
+  margin-block-start: var(--flow-space, 1em);
+}
+
+/* ======================================================================
+ * UTILITIES
+ * ======================================================================
+ */
+
+.line-through {
+  text-decoration: line-through;
+}
+
+.subtle-text {
+  color: var(--clr-subtle-text);
+}
+
+/* ======================================================================
+ * BLOCKS
+ * ======================================================================
+ */
+
+.card {
+  position: relative;
+  border-radius: 1rem;
+  box-shadow:
+    2px 2px 2px var(--clr-shadow),
+    -2px 2px 2px var(--clr-shadow);
+  container-type: inline-size;
+  padding-block-end: calc(2cqi + 0.5rem);
+  grid-template-columns: 1fr 1fr;
+
+  > * {
+    margin-inline: 1rem;
+  }
+}
+
+.card__heading {
+  order: 1;
+  grid-column: span 2;
+  font-size: var(--fluid-font-size-xl);
+  font-weight: 600;
+  margin-block-start: 1rem;
+}
+
+.card__status {
+  order: 2;
+  font-size: var(--fluid-font-size-m);
+  color: var(--clr-subtle-text);
+}
+
+.card__priority {
+  order: 3;
+  font-size: var(--fluid-font-size-m);
+  color: var(--clr-subtle-text);
+  margin-inline-start: auto;
+}
+/* ======================================================================
+ * EXCEPTIONS
+ * ======================================================================
+ */

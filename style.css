@@ -96,6 +96,10 @@ h6 {
   line-height: 1.1;
 }
 
+h1 {
+  font-size: var(--fluid-font-size-xxl);
+}
+
 p {
   text-wrap: pretty;
 }
@@ -149,6 +153,36 @@ p {
   color: var(--clr-subtle-text);
 }
 
+.priority-1 {
+  font-size: var(--static-font-size-l);
+  background-color: darkgreen;
+  color: contrast-color(darkgreen);
+}
+
+.priority-2 {
+  font-size: var(--static-font-size-l);
+  background-color: yellow;
+  color: contrast-color(yellow);
+}
+
+.priority-3 {
+  font-size: var(--static-font-size-l);
+  background-color: orange;
+  color: contrast-color(orange);
+}
+
+.priority-4 {
+  font-size: var(--static-font-size-l);
+  background-color: orangered;
+  color: contrast-color(orangered);
+}
+
+.priority-5 {
+  font-size: var(--static-font-size-l);
+  background-color: red;
+  color: contrast-color(red);
+}
+
 /* ======================================================================
  * BLOCKS
  * ======================================================================
@@ -185,8 +219,11 @@ p {
 
 .card__priority {
   order: 3;
-  font-size: var(--fluid-font-size-m);
-  color: var(--clr-subtle-text);
+  font-size: var(--fluid-font-size-xl);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: solid thin var(--clr-subtle-text);
+  text-align: center;
   margin-inline-start: auto;
 }
 /* ======================================================================

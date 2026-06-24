@@ -92,31 +92,42 @@ tasks.toggleStatus("water plants");
 tasks.addTask("buy chives", 5);
 
 /* Render */
-const app = document.querySelector("#app");
-app?.classList.add("grid");
-
-function appendElement(
-  parent: Element,
-  tagName: string,
-  textContent: string,
-  className?: string,
-) {
-  const element = document.createElement(tagName);
-  element.textContent = textContent;
-  if (className) {
-    element.className = className;
-  }
-  parent.appendChild(element);
+interface Card {
+  renderable: HTMLElement;
+  heading: HTMLElement;
+  status: HTMLElement;
+  priority: HTMLElement;
 }
 
-function createCard(task: Task): HTMLElement {
-  const card = document.createElement("article");
-  card.classList.add("card");
-  card.classList.add("grid");
-  card.classList.add("container");
-  appendElement(card, "h2", task.name, "card__heading");
-  appendElement(card, "p", `${task.priority}`, "card__priority");
-  appendElement(card, "p", task.status, "card__status");
+function createCard(task: Task): Card {
+  let card: Card = {
+    renderable: document.createElement("article"),
+    heading: document.createElement("h2"),
+    priority: document.createElement("p"),
+    status: document.createElement("p"),
+  };
+
+  card.renderable.className = "card | grid container";
+  card.heading.className = "card__heading";
+  card.priority.className = "card__priority";
+  card.status.className = "card__status";
+
+  card.heading.textContent = task.name;
+  card.priority.textContent = `${task.priority}`;
+  card.status.textContent = task.status;
+
+  card = applyConditionalStyles(card, task);
+  card.renderable.append(card.heading, card.priority, card.status);
+  return card;
+}
+
+function applyConditionalStyles(card: Card, task: Task): Card {
+  if (task.status === "completed") {
+    card.heading.classList.add("line-through");
+    card.renderable.classList.add("subtle-text");
+  }
+  card.priority.classList.add(`priority-${task.priority}`);
+
   return card;
 }
 
@@ -127,7 +138,10 @@ function renderCards(): void {
   app.innerHTML = "";
 
   const cards = tasks.contents.map((task) => createCard(task));
-  cards.forEach((card) => app.appendChild(card));
+  cards.forEach((card) => app.appendChild(card.renderable));
 }
+
+const app = document.querySelector("#app");
+app?.classList.add("grid");
 
 renderCards();

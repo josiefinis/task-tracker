@@ -200,8 +200,8 @@ function createNewTaskForm(): NewTaskForm {
   setDashedBorderStyle(form);
 
   form.renderable.append(
-    form.priorityButton,
     form.taskName.renderable,
+    form.priorityButton,
     form.saveButton,
   );
 
@@ -245,8 +245,8 @@ function createEditTaskForm(task: Task): EditTaskForm {
   setDashedBorderStyle(form);
 
   form.renderable.append(
-    form.priorityButton,
     form.taskName.renderable,
+    form.priorityButton,
     form.saveButton,
     form.deleteButton,
   );
@@ -287,6 +287,7 @@ function createCard(task: Task): Card {
   card.editTask.addEventListener("click", () => {
     task.isEditing = true;
     renderAll();
+    document.getElementById("task-name")?.focus();
   });
 
   card = applyConditionalStyles(card, task);
@@ -353,6 +354,7 @@ function handleSaveTask(
     tasks.addTask(name, priority);
   }
   renderAll();
+  document.getElementById("task-name")?.focus();
 }
 
 function renderAll(): void {

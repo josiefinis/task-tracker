@@ -2,6 +2,7 @@ type Priority = 1 | 2 | 3 | 4 | 5;
 type Status = "pending" | "completed";
 
 interface Task {
+  id: number;
   name: string;
   priority: Priority;
   status: Status;
@@ -21,18 +22,22 @@ interface TaskList {
     description?: string,
     notes?: string,
   ): number;
-  toggleStatus(taskName: string): Status | undefined;
+  toggleStatus(id: number): Status | undefined;
   listAll(): Task[];
   listCompleted(): Task[];
   listPending(): Task[];
 }
 
+let counter = 0;
+
 class TaskObject implements Task {
+  id: number;
   name: string;
   priority: Priority;
   status: Status = "pending";
 
   constructor(name: string, priority: Priority) {
+    this.id = counter++;
     this.name = name;
     this.priority = priority;
   }
@@ -64,10 +69,8 @@ const tasks: TaskList = {
     return this.length;
   },
 
-  toggleStatus(taskName: string): Status | undefined {
-    const task: Task | undefined = this.contents.find(
-      (task) => task.name === taskName,
-    );
+  toggleStatus(id: number): Status | undefined {
+    const task: Task | undefined = this.contents.find((task) => task.id === id);
     return task ? task.toggleStatus() : undefined;
   },
 
@@ -86,18 +89,25 @@ const tasks: TaskList = {
 
 tasks.addTask("meet with CTO", 5);
 tasks.addTask("client lunch", 3, "", "lights");
-tasks.addTask("phone purchasing");
+tasks.addTask("investors call");
 tasks.addTask("give keynote", 4);
-tasks.addTask("onboard new hire", 4);
+tasks.addTask("board meeting", 4);
 tasks.addTask("book flights", 2);
-tasks.toggleStatus("book flights");
+tasks.toggleStatus(5);
 
 /* Render */
 interface Card {
   renderable: HTMLElement;
-  heading: HTMLElement;
-  status: HTMLElement;
-  priority: HTMLElement;
+  heading: HTMLHeadingElement;
+  status: HTMLParagraphElement;
+  priority: HTMLParagraphElement;
+  toggleStatus: HTMLButtonElement;
+  editTask: HTMLButtonElement;
+}
+
+function handleToggleStatusClick(id: number) {
+  tasks.toggleStatus(id);
+  renderCards();
 }
 
 function createCard(task: Task): Card {
@@ -106,19 +116,36 @@ function createCard(task: Task): Card {
     heading: document.createElement("h2"),
     priority: document.createElement("p"),
     status: document.createElement("p"),
+    toggleStatus: document.createElement("button"),
+    editTask: document.createElement("button"),
   };
 
   card.renderable.className = "card | grid container";
   card.heading.className = "card__heading";
   card.priority.className = "card__priority";
   card.status.className = "card__status";
+  card.toggleStatus.className = "card__toggle-status icon button";
+  card.editTask.className = "card__edit-task icon button";
 
   card.heading.textContent = task.name;
   card.priority.textContent = `${task.priority}`;
   card.status.textContent = task.status;
+  card.toggleStatus.textContent = `${task.status === "completed" ? "\u21b6" : "\u2714"}`;
+  card.toggleStatus.ariaLabel = `${task.status === "completed" ? "set task to pending" : "set task to completed"}`;
+  card.toggleStatus.addEventListener("click", () => {
+    handleToggleStatusClick(task.id);
+  });
+  card.editTask.textContent = "\u270e";
+  card.editTask.ariaLabel = "Edit task";
 
   card = applyConditionalStyles(card, task);
-  card.renderable.append(card.heading, card.priority, card.status);
+  card.renderable.append(
+    card.heading,
+    card.priority,
+    card.status,
+    card.toggleStatus,
+    card.editTask,
+  );
   return card;
 }
 

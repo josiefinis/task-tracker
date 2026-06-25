@@ -45,11 +45,14 @@
   --clr-background: light-dark(var(--pink-100), var(--pink-950));
   --clr-subtle-text: light-dark(var(--gray-600), var(--gray-300));
   --clr-shadow: light-dark(var(--gray-400), var(--black));
+
   --clr-priority-1: oklch(0.54 0.2187 260 / 0.5);
   --clr-priority-2: oklch(0.54 0.2187 285 / 0.5);
   --clr-priority-3: oklch(0.54 0.2187 310 / 0.5);
   --clr-priority-4: oklch(0.54 0.2187 335 / 0.5);
   --clr-priority-5: oklch(0.54 0.2187 360 / 0.5);
+
+  --bg-icon-button-hover: light-dark(var(--pink-200), var(--pink-800));
 
   /* Spacing */
   --spacing: 0.25rem;
@@ -208,6 +211,26 @@ p {
  * ======================================================================
  */
 
+.button {
+  font-size: var(--fluid-font-size-l);
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  block-size: calc(1.5 * var(--fluid-font-size-l));
+  aspect-ratio: 1;
+  border-radius: 20%;
+  border: none;
+  background-color: oklch(0 0 0 / 0);
+  color: var(--clr-brand);
+  &:hover {
+    background-color: var(--bg-icon-button-hover);
+    color: contrast-color(var(--bg-icon-button-hover));
+  }
+}
+
 .card {
   position: relative;
   border-radius: 1rem;
@@ -216,7 +239,7 @@ p {
     2px 2px 2px var(--clr-shadow),
     -2px 2px 2px var(--clr-shadow);
   container-type: inline-size;
-  padding-block-end: calc(2cqi + 0.5rem);
+  padding-block: clamp(0.5rem, 1cqi, 1rem);
   grid-template-columns: 1fr 1fr;
 
   > * {
@@ -225,28 +248,37 @@ p {
 }
 
 .card__heading {
-  order: 1;
+  order: 3;
   grid-column: span 2;
   font-size: var(--fluid-font-size-xl);
   font-weight: var(--font-weight-bold);
-  margin-block-start: 1rem;
+}
+
+.card__toggle-status {
+  order: 5;
+  margin-inline-start: auto;
+}
+
+.card__edit-task {
+  order: 2;
+  margin-inline-start: auto;
 }
 
 .card__status {
-  order: 2;
+  order: 4;
   font-size: var(--fluid-font-size-m);
   color: var(--clr-subtle-text);
 }
 
 .card__priority {
-  order: 3;
+  order: 1;
   font-size: var(--fluid-font-size-xl);
   font-weight: var(--font-weight-bold);
   aspect-ratio: 1;
   border-radius: 50%;
   border: solid thin var(--clr-subtle-text);
   text-align: center;
-  margin-inline-start: auto;
+  margin-inline-end: auto;
 }
 /* ======================================================================
  * EXCEPTIONS

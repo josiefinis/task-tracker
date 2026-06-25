@@ -114,13 +114,14 @@ interface Card {
 }
 
 interface NewTaskForm {
-  renderable: HTMLFormElement;
+  renderable: HTMLElement;
   taskName: LabeledInput;
   priorityButton: PriorityButton;
   saveButton: HTMLButtonElement;
 }
 
 interface EditTaskForm extends NewTaskForm {
+  dialog: HTMLDialogElement;
   deleteButton: HTMLButtonElement;
 }
 
@@ -175,7 +176,7 @@ function createLabeledInput(id: string, labelText: string): LabeledInput {
 
 function createNewTaskForm(): NewTaskForm {
   const form: NewTaskForm = {
-    renderable: document.createElement("form"),
+    renderable: document.createElement("div"),
     taskName: createLabeledInput("task-name", "Task name"),
     priorityButton: createPriorityButton(1),
     saveButton: createButton("Save"),
@@ -209,7 +210,8 @@ function createNewTaskForm(): NewTaskForm {
 
 function createEditTaskForm(task: Task): EditTaskForm {
   const form: EditTaskForm = {
-    renderable: document.createElement("form"),
+    renderable: document.createElement("div"),
+    dialog: document.createElement("dialog"),
     taskName: createLabeledInput("task-name", "Task name"),
     priorityButton: createPriorityButton(task.priority),
     saveButton: createButton("Save"),
@@ -245,8 +247,8 @@ function createEditTaskForm(task: Task): EditTaskForm {
   form.renderable.append(
     form.priorityButton,
     form.taskName.renderable,
-    form.deleteButton,
     form.saveButton,
+    form.deleteButton,
   );
 
   return form;
@@ -272,10 +274,12 @@ function createCard(task: Task): Card {
   card.heading.textContent = task.name;
   card.priority.textContent = `${task.priority}`;
   card.status.textContent = task.status;
+
   card.toggleStatus.textContent = `${task.status === "completed" ? "\u21b6" : "\u2714"}`;
   card.toggleStatus.ariaLabel = `${task.status === "completed" ? "set task to pending" : "set task to completed"}`;
   card.toggleStatus.addEventListener("click", () => {
-    handleToggleStatusClick(task.id);
+    handleToggleStatusClick(task, card);
+    card.toggleStatus.focus();
   });
 
   card.editTask.textContent = "\u270e";
@@ -322,9 +326,14 @@ function setDashedBorderStyle(form: EditTaskForm | NewTaskForm) {
  * Event Handling
  * ======================================================================
  */
-function handleToggleStatusClick(id: number): void {
-  tasks.toggleStatus(id);
-  renderAll();
+function handleToggleStatusClick(task: Task, card: Card): void {
+  task.toggleStatus();
+  if (!app) {
+    return;
+  }
+  const updatedCard: Card = createCard(task);
+  app.replaceChild(updatedCard.renderable, card.renderable);
+  updatedCard.toggleStatus.focus();
 }
 
 function handleSaveTask(

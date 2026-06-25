@@ -242,7 +242,7 @@ input {
   align-items: center;
   block-size: calc(1.5 * var(--fluid-font-size-l));
   aspect-ratio: 1;
-  border-radius: 20%;
+  border-radius: 1rem;
   border: none;
   background-color: oklch(0 0 0 / 0);
   color: var(--clr-brand);
@@ -318,14 +318,14 @@ input {
 
 .form__delete {
   border-radius: 1rem;
-  order: 4;
-  margin-inline-end: auto;
+  order: 5;
+  margin-inline-start: auto;
 }
 
 .form__save {
   border-radius: 1rem;
-  order: 5;
-  margin-inline-start: auto;
+  order: 4;
+  margin-inline-end: auto;
 }
 
 /* ======================================================================

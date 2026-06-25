@@ -133,6 +133,14 @@ p {
   text-wrap: pretty;
 }
 
+button,
+input {
+  &:hover {
+    background-color: var(--bg-icon-button-hover);
+    color: contrast-color(var(--bg-icon-button-hover));
+  }
+}
+
 /* ======================================================================
  * COMPOSITION
  * ======================================================================
@@ -206,6 +214,18 @@ p {
   background-color: var(--clr-priority-5);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ======================================================================
  * BLOCKS
  * ======================================================================
@@ -213,6 +233,7 @@ p {
 
 .button {
   font-size: var(--fluid-font-size-l);
+  padding-inline: calc(2 * var(--spacing));
 }
 
 .icon {
@@ -225,10 +246,6 @@ p {
   border: none;
   background-color: oklch(0 0 0 / 0);
   color: var(--clr-brand);
-  &:hover {
-    background-color: var(--bg-icon-button-hover);
-    color: contrast-color(var(--bg-icon-button-hover));
-  }
 }
 
 .card {
@@ -247,11 +264,14 @@ p {
   }
 }
 
+.task-name {
+  font-size: var(--fluid-font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
 .card__heading {
   order: 3;
   grid-column: span 2;
-  font-size: var(--fluid-font-size-xl);
-  font-weight: var(--font-weight-bold);
 }
 
 .card__toggle-status {
@@ -270,7 +290,7 @@ p {
   color: var(--clr-subtle-text);
 }
 
-.card__priority {
+.priority {
   order: 1;
   font-size: var(--fluid-font-size-xl);
   font-weight: var(--font-weight-bold);
@@ -280,7 +300,39 @@ p {
   text-align: center;
   margin-inline-end: auto;
 }
+
+.card.form {
+  opacity: 0.4;
+}
+
+.form__input-group {
+  order: 3;
+  grid-column: span 2;
+}
+
+.form__input {
+  max-inline-size: 100%;
+  border-radius: 1rem;
+  padding-inline: calc(2 * var(--spacing));
+}
+
+.form__delete {
+  border-radius: 1rem;
+  order: 4;
+  margin-inline-end: auto;
+}
+
+.form__save {
+  border-radius: 1rem;
+  order: 5;
+  margin-inline-start: auto;
+}
+
 /* ======================================================================
  * EXCEPTIONS
  * ======================================================================
  */
+
+* [data-type="dashed-border"] {
+  border: 2px dashed var(--clr-accent);
+}

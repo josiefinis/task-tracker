@@ -84,12 +84,13 @@ const tasks: TaskList = {
   },
 };
 
-tasks.addTask("make dinner", 5);
-tasks.addTask("do laundry", 3, "", "lights");
-tasks.addTask("buy paint");
-tasks.addTask("water plants", 4);
-tasks.toggleStatus("water plants");
-tasks.addTask("buy chives", 5);
+tasks.addTask("meet with CTO", 5);
+tasks.addTask("client lunch", 3, "", "lights");
+tasks.addTask("phone purchasing");
+tasks.addTask("give keynote", 4);
+tasks.addTask("onboard new hire", 4);
+tasks.addTask("book flights", 2);
+tasks.toggleStatus("book flights");
 
 /* Render */
 interface Card {

@@ -1,33 +1,55 @@
 :root {
   /* Fonts */
+  --font-family: "Gaegu", handwriting, sans-serif;
+
   --static-font-size-xxl: 3rem;
   --static-font-size-xl: 2rem;
   --static-font-size-l: 1.5rem;
   --static-font-size-m: 1rem;
   --static-font-size-s: 0.8rem;
 
-  --fluid-font-size-xxl: clamp(2rem, 8cqi + 0.5rem, 4rem);
-  --fluid-font-size-xl: clamp(1.2rem, 5cqi + 0.5rem, 2.5rem);
-  --fluid-font-size-l: clamp(0.9rem, 2.2cqi + 0.5rem, 1.5rem);
-  --fluid-font-size-m: clamp(0.8rem, 2cqi + 0.5rem, 1rem);
-  --fluid-font-size-s: clamp(0.7rem, 1cqi + 0.5rem, 1rem);
+  --fluid-font-size-xxl: clamp(3rem, 10cqi + 0.5rem, 6rem);
+  --fluid-font-size-xl: clamp(2rem, 8cqi + 0.5rem, 4rem);
+  --fluid-font-size-l: clamp(1.5rem, 6cqi + 0.5rem, 3rem);
+  --fluid-font-size-m: clamp(1rem, 4cqi + 0.5rem, 2rem);
+  --fluid-font-size-s: clamp(0.7rem, 2cqi + 0.5rem, 1rem);
 
-  --font-weight-bold: 600;
-  --font-weight-bolder: 800;
+  --font-weight-fine: 300;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  /* Brand Colors */
+  --pink-50: oklch(0.9429 0.0315 353.79);
+  --pink-100: oklch(0.8515 0.0863 353.79);
+  --pink-200: oklch(0.7779 0.148 353.79);
+  --pink-300: oklch(0.7103 0.2097 353.79);
+  --pink-400: oklch(0.6515 0.259 353.79);
+  --pink-600: oklch(0.4221 0.1702 353.79);
+  --pink-800: oklch(0.2926 0.1085 353.79);
+  --pink-900: oklch(0.1868 0.0691 353.79);
+  --pink-950: oklch(0.114 0.0467 353.79);
 
   /* Neutral Colors */
-  --gray-50: oklch(98.53% 0.0065 250.77);
-  --gray-100: oklch(96.5% 0.01 250);
-  --gray-300: oklch(85.82% 0.0156 254.4);
-  --gray-400: oklch(70.12% 0.019 252.3);
-  --gray-600: oklch(44.51% 0.0304 257.65);
-  --gray-900: oklch(18.23% 0.0298 274.65);
-  --gray-950: oklch(18.23% 0.0298 274.65);
+  --gray-50: oklch(98.53% 0 0);
+  --gray-100: oklch(96.5% 0 0);
+  --gray-300: oklch(85.82% 0 0);
+  --gray-400: oklch(70.12% 0 0);
+  --gray-600: oklch(44.51% 0 0);
+  --gray-900: oklch(18.23% 0 0);
+  --gray-950: oklch(17% 0 0);
   --white: oklch(100% 0 0);
   --black: oklch(0 0 0);
 
+  /* Semantic Colors */
+  --clr-accent: light-dark(var(--pink-800), var(--pink-200));
+  --clr-background: light-dark(var(--pink-100), var(--pink-950));
   --clr-subtle-text: light-dark(var(--gray-600), var(--gray-300));
-  --clr-shadow: light-dark(var(--gray-100), var(--black));
+  --clr-shadow: light-dark(var(--gray-400), var(--black));
+  --clr-priority-1: oklch(0.54 0.2187 260 / 0.5);
+  --clr-priority-2: oklch(0.54 0.2187 285 / 0.5);
+  --clr-priority-3: oklch(0.54 0.2187 310 / 0.5);
+  --clr-priority-4: oklch(0.54 0.2187 335 / 0.5);
+  --clr-priority-5: oklch(0.54 0.2187 360 / 0.5);
 
   /* Spacing */
   --spacing: 0.25rem;
@@ -83,7 +105,9 @@ html {
  */
 
 body {
-  font-family: sans-serif;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-normal);
+  background-color: var(--clr-background);
 }
 
 h1,
@@ -94,10 +118,12 @@ h5,
 h6 {
   text-wrap: balance;
   line-height: 1.1;
+  font-weight: var(--font-weight-bold);
 }
 
 h1 {
   font-size: var(--fluid-font-size-xxl);
+  color: var(--clr-accent);
 }
 
 p {
@@ -140,6 +166,10 @@ p {
   margin-block-start: var(--flow-space, 1em);
 }
 
+.margin-inline {
+  margin-inline: clamp(1rem, 4vw, 3rem);
+}
+
 /* ======================================================================
  * UTILITIES
  * ======================================================================
@@ -154,33 +184,23 @@ p {
 }
 
 .priority-1 {
-  font-size: var(--static-font-size-l);
-  background-color: darkgreen;
-  color: contrast-color(darkgreen);
+  background-color: var(--clr-priority-1);
 }
 
 .priority-2 {
-  font-size: var(--static-font-size-l);
-  background-color: yellow;
-  color: contrast-color(yellow);
+  background-color: var(--clr-priority-2);
 }
 
 .priority-3 {
-  font-size: var(--static-font-size-l);
-  background-color: orange;
-  color: contrast-color(orange);
+  background-color: var(--clr-priority-3);
 }
 
 .priority-4 {
-  font-size: var(--static-font-size-l);
-  background-color: orangered;
-  color: contrast-color(orangered);
+  background-color: var(--clr-priority-4);
 }
 
 .priority-5 {
-  font-size: var(--static-font-size-l);
-  background-color: red;
-  color: contrast-color(red);
+  background-color: var(--clr-priority-5);
 }
 
 /* ======================================================================
@@ -191,6 +211,7 @@ p {
 .card {
   position: relative;
   border-radius: 1rem;
+  background-color: light-dark(var(--white), var(--gray-950));
   box-shadow:
     2px 2px 2px var(--clr-shadow),
     -2px 2px 2px var(--clr-shadow);
@@ -207,7 +228,7 @@ p {
   order: 1;
   grid-column: span 2;
   font-size: var(--fluid-font-size-xl);
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
   margin-block-start: 1rem;
 }
 
@@ -220,6 +241,7 @@ p {
 .card__priority {
   order: 3;
   font-size: var(--fluid-font-size-xl);
+  font-weight: var(--font-weight-bold);
   aspect-ratio: 1;
   border-radius: 50%;
   border: solid thin var(--clr-subtle-text);

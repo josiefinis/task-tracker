@@ -249,19 +249,16 @@ input {
 }
 
 .card {
+  container-type: inline-size;
+  grid-template-columns: 6fr 1fr;
   position: relative;
   border-radius: 1rem;
   background-color: light-dark(var(--white), var(--gray-950));
   box-shadow:
     2px 2px 2px var(--clr-shadow),
     -2px 2px 2px var(--clr-shadow);
-  container-type: inline-size;
-  padding-block: clamp(0.5rem, 1cqi, 1rem);
-  grid-template-columns: 1fr 1fr;
+  padding: 1rem;
 
-  > * {
-    margin-inline: 1rem;
-  }
 }
 
 .task-name {
@@ -270,8 +267,7 @@ input {
 }
 
 .card__heading {
-  order: 3;
-  grid-column: span 2;
+  order: 1;
 }
 
 .card__toggle-status {
@@ -285,13 +281,14 @@ input {
 }
 
 .card__status {
-  order: 4;
+  order: 3;
+  grid-column: span 2;
   font-size: var(--fluid-font-size-m);
   color: var(--clr-subtle-text);
 }
 
 .priority {
-  order: 1;
+  order: 4;
   font-size: var(--fluid-font-size-xl);
   font-weight: var(--font-weight-bold);
   aspect-ratio: 1;
@@ -301,12 +298,18 @@ input {
   margin-inline-end: auto;
 }
 
-.card.form {
+.form.card {
   opacity: 0.4;
 }
 
+.form {
+  .priority {
+    grid-column: span 2;
+  }
+}
+
 .form__input-group {
-  order: 3;
+  order: 1;
   grid-column: span 2;
 }
 
@@ -318,13 +321,13 @@ input {
 
 .form__delete {
   border-radius: 1rem;
-  order: 5;
+  order: 6;
   margin-inline-start: auto;
 }
 
 .form__save {
   border-radius: 1rem;
-  order: 4;
+  order: 5;
   margin-inline-end: auto;
 }
 

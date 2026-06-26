@@ -293,10 +293,10 @@ function createCard(task: Task): Card {
   card = applyConditionalStyles(card, task);
 
   card.renderable.append(
-    card.priority,
-    card.editTask,
     card.heading,
     card.status,
+    card.priority,
+    card.editTask,
     card.toggleStatus,
   );
   return card;

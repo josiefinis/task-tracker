@@ -1,3 +1,7 @@
+/* ======================================================================
+ * Tasks
+ * ======================================================================
+ */
 type Priority = 1 | 2 | 3 | 4 | 5;
 type Status = "pending" | "completed";
 
@@ -96,14 +100,21 @@ const tasks: TaskList = {
   },
 };
 
+/* ======================================================================
+ * Create some tasks for demonstration purposes. */
 tasks.addTask("meet with CTO", 5);
 tasks.addTask("client lunch", 3, "", "lights");
 tasks.addTask("investors call");
 tasks.addTask("give keynote", 4);
 tasks.addTask("board meeting", 4);
 tasks.addTask("book flights", 2);
+/* ======================================================================
+ */
 
-/* Render */
+/* ======================================================================
+ * Render Tasks as Cards
+ * ======================================================================
+ */
 interface Card {
   renderable: HTMLElement;
   heading: HTMLHeadingElement;
@@ -357,6 +368,10 @@ function handleSaveTask(
   document.getElementById("task-name")?.focus();
 }
 
+/* ======================================================================
+ * Rendering
+ * ======================================================================
+ */
 function renderAll(): void {
   renderCards();
   renderNewCardForm();

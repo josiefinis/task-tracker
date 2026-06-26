@@ -118,149 +118,8 @@ tasks.addTask("book flights", 2);
  * Render Tasks as Cards
  * ======================================================================
  */
-interface NewTaskForm {
-  rootElement: HTMLElement;
-  taskName: LabeledInput;
-  priorityButton: PriorityButton;
-  saveButton: HTMLButtonElement;
-}
-
-interface EditTaskForm extends NewTaskForm {
-  dialog: HTMLDialogElement;
-  deleteButton: HTMLButtonElement;
-}
-
-interface LabeledInput {
-  rootElement: HTMLDivElement;
-  label: HTMLLabelElement;
-  input: HTMLInputElement;
-}
-
-interface PriorityButton extends HTMLButtonElement {
-  priority?: Priority;
-}
-
-/* ======================================================================
- * Element Creation
- * ======================================================================
- */
-
-function createButton(textContent: string): HTMLButtonElement {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = textContent;
-  return button;
-}
-
-function createPriorityButton(priority: Priority): PriorityButton {
-  const button: PriorityButton = createButton(`${priority}`);
-  button.priority = priority;
-  button.className = "priority icon button";
-  button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
-  button.addEventListener("click", () => {
-    priority = (1 + (priority % 5)) as Priority;
-    button.priority = priority;
-    button.textContent = `${button.priority}`;
-    button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
-  });
-  return button;
-}
-
-function createLabeledInput(id: string, labelText: string): LabeledInput {
-  const group: LabeledInput = {
-    rootElement: document.createElement("div"),
-    label: document.createElement("label"),
-    input: document.createElement("input"),
-  };
-  group.rootElement.append(group.label, group.input);
-  group.input.id = id;
-  group.label.htmlFor = id;
-  group.label.textContent = labelText;
-
-  return group;
-}
-
-function createNewTaskForm(): NewTaskForm {
-  const form: NewTaskForm = {
-    rootElement: document.createElement("div"),
-    taskName: createLabeledInput("task-name", "Task name"),
-    priorityButton: createPriorityButton(1),
-    saveButton: createButton("Save"),
-  };
-
-  form.taskName.input.placeholder = "New task...";
-
-  form.rootElement.className = "form card | grid container";
-  form.taskName.rootElement.className = "form__input-group";
-  form.taskName.input.className = "form__input task-name";
-  form.taskName.label.className = "visually-hidden";
-  form.saveButton.className = "form__save button";
-
-  form.saveButton.addEventListener("click", () => {
-    handleSaveTask(
-      form.taskName.input.value,
-      form.priorityButton.priority as Priority,
-    );
-  });
-
-  setDashedBorderStyle(form);
-
-  form.rootElement.append(
-    form.taskName.rootElement,
-    form.priorityButton,
-    form.saveButton,
-  );
-
-  return form;
-}
-
-function createEditTaskForm(task: Task): EditTaskForm {
-  const form: EditTaskForm = {
-    rootElement: document.createElement("div"),
-    dialog: document.createElement("dialog"),
-    taskName: createLabeledInput("task-name", "Task name"),
-    priorityButton: createPriorityButton(task.priority),
-    saveButton: createButton("Save"),
-    deleteButton: createButton("\u{1F5D1}"),
-  };
-
-  form.rootElement.className = "form card | grid container";
-  form.taskName.rootElement.className = "form__input-group";
-  form.taskName.input.className = "form__input task-name";
-  form.taskName.label.className = "visually-hidden";
-  form.saveButton.className = "form__save button";
-  form.deleteButton.className = "form__delete icon button";
-
-  form.taskName.input.value = task.name;
-
-  form.deleteButton.ariaLabel = "Delete task";
-  form.deleteButton.addEventListener("click", () => {
-    tasks.deleteTask(task.id);
-    cards.renderAll();
-  });
-
-  form.saveButton.ariaLabel = "Save task";
-  form.saveButton.addEventListener("click", () => {
-    handleSaveTask(
-      form.taskName.input.value,
-      form.priorityButton.priority as Priority,
-      task,
-    );
-  });
-
-  setDashedBorderStyle(form);
-
-  form.rootElement.append(
-    form.taskName.rootElement,
-    form.priorityButton,
-    form.saveButton,
-    form.deleteButton,
-  );
-
-  return form;
-}
-
 interface Card {
+  taskId: TaskId;
   rootElement: HTMLElement;
   heading: HTMLHeadingElement;
   status: HTMLParagraphElement;
@@ -274,6 +133,39 @@ interface Card {
   createPriorityElement(taskPriority: Priority): HTMLParagraphElement;
   createToggleStatusButton(task: Task): HTMLButtonElement;
   createEditTaskButton(): HTMLButtonElement;
+  render(): HTMLElement;
+}
+
+interface NewTaskForm {
+  rootElement: HTMLDivElement;
+  taskNameInput: LabeledInput;
+  priorityButton: PriorityButton;
+  saveButton: HTMLButtonElement;
+
+  createRootElement(): HTMLDivElement;
+  createTaskNameInput(): LabeledInput;
+  createPriorityButton(priority?: Priority): PriorityButton;
+  createSaveButton(): HTMLButtonElement;
+  render(): HTMLElement;
+}
+
+interface EditTaskForm extends NewTaskForm {
+  task: Task;
+  dialog: HTMLDialogElement;
+  deleteButton: HTMLButtonElement;
+
+  createDialogElement(): HTMLDialogElement;
+  createDeleteButton(): HTMLButtonElement;
+}
+
+interface LabeledInput {
+  rootElement: HTMLDivElement;
+  label: HTMLLabelElement;
+  input: HTMLInputElement;
+}
+
+interface PriorityButton extends HTMLButtonElement {
+  priority?: Priority;
 }
 
 class CardObject implements Card {
@@ -293,13 +185,6 @@ class CardObject implements Card {
     this.priority = this.createPriorityElement(task.priority);
     this.toggleStatusButton = this.createToggleStatusButton(task);
     this.editTaskButton = this.createEditTaskButton();
-    this.rootElement.append(
-      this.heading,
-      this.status,
-      this.priority,
-      this.editTaskButton,
-      this.toggleStatusButton,
-    );
   }
 
   createRootElement(): HTMLElement {
@@ -358,17 +243,175 @@ class CardObject implements Card {
     });
     return editTaskButton;
   }
+
+  render(): HTMLElement {
+    const element = this.rootElement;
+    element.append(
+      this.heading,
+      this.status,
+      this.priority,
+      this.editTaskButton,
+      this.toggleStatusButton,
+    );
+    return element;
+  }
 }
 
-/* ======================================================================
- * Element Styling
- * ======================================================================
- */
-function setDashedBorderStyle(form: EditTaskForm | NewTaskForm) {
-  form.rootElement.dataset["type"] = "dashed-border";
-  form.taskName.input.dataset["type"] = "dashed-border";
-  form.priorityButton.dataset["type"] = "dashed-border";
-  form.saveButton.dataset["type"] = "dashed-border";
+class NewTaskFormObject implements NewTaskForm {
+  rootElement: HTMLDivElement;
+  taskNameInput: LabeledInput;
+  priorityButton: PriorityButton;
+  saveButton: HTMLButtonElement;
+
+  constructor() {
+    this.rootElement = this.createRootElement();
+    this.taskNameInput = this.createTaskNameInput();
+    this.priorityButton = this.createPriorityButton();
+    this.saveButton = this.createSaveButton();
+  }
+
+  createRootElement(): HTMLDivElement {
+    const rootElement = document.createElement("div");
+    rootElement.className = "form card | grid container";
+    rootElement.dataset["type"] = "dashed-border";
+    return rootElement;
+  }
+
+  createTaskNameInput(): LabeledInput {
+    const taskNameInput = createLabeledInput("task-name", "Task name");
+    taskNameInput.rootElement.className = "form__input-group";
+    taskNameInput.input.className = "form__input task-name";
+    taskNameInput.label.className = "visually-hidden";
+    taskNameInput.input.placeholder = "New task...";
+    taskNameInput.input.dataset["type"] = "dashed-border";
+    return taskNameInput;
+  }
+
+  createPriorityButton(priority: Priority = 1): PriorityButton {
+    const button: PriorityButton = createButton(`${priority}`);
+    button.priority = priority;
+    button.className = "priority icon button";
+    button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
+    button.dataset["type"] = "dashed-border";
+
+    button.addEventListener("click", () => {
+      priority = (1 + (priority % 5)) as Priority;
+      button.priority = priority;
+      button.textContent = `${button.priority}`;
+      button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
+    });
+
+    return button;
+  }
+
+  createSaveButton(): HTMLButtonElement {
+    const saveButton = createButton("Save");
+    saveButton.className = "form__save button";
+    saveButton.dataset["type"] = "dashed-border";
+
+    saveButton.addEventListener("click", () => {
+      this.handleSaveButtonClick();
+    });
+
+    return saveButton;
+  }
+
+  handleSaveButtonClick(): void {
+    const name = this.taskNameInput.input.value.trim();
+    if (!name) {
+      return;
+    }
+    tasks.addTask(name, this.priorityButton.priority);
+    cards.renderAll();
+    document.getElementById("task-name")?.focus();
+  }
+
+  render(): HTMLElement {
+    const element = this.rootElement;
+    element.append(
+      this.taskNameInput.rootElement,
+      this.priorityButton,
+      this.saveButton,
+    );
+    return element;
+  }
+}
+
+class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
+  task: Task;
+  dialog: HTMLDialogElement;
+  deleteButton: HTMLButtonElement;
+
+  constructor(task: Task) {
+    super();
+    this.task = task;
+    this.dialog = this.createDialogElement();
+    this.priorityButton = this.createPriorityButton(task.priority);
+    this.deleteButton = this.createDeleteButton();
+    this.taskNameInput.input.value = task.name;
+
+    this.rootElement.appendChild(this.deleteButton);
+  }
+
+  createDialogElement(): HTMLDialogElement {
+    const dialogElement = document.createElement("dialog");
+    return dialogElement;
+  }
+
+  createDeleteButton(): HTMLButtonElement {
+    const deleteButton = createButton("\u{1F5D1}");
+    deleteButton.className = "form__delete icon button";
+    deleteButton.ariaLabel = "Delete task";
+
+    deleteButton.addEventListener("click", () => {
+      tasks.deleteTask(this.task.id);
+      cards.renderAll();
+    });
+
+    return deleteButton;
+  }
+
+  override handleSaveButtonClick(): void {
+    const name = this.taskNameInput.input.value.trim();
+    if (!name) {
+      return;
+    }
+    this.task.name = name;
+    this.task.priority = this.priorityButton.priority as Priority;
+    cards.editingTaskId = null;
+    cards.renderAll();
+  }
+
+  override render(): HTMLElement {
+    const element = this.rootElement;
+    element.append(
+      this.taskNameInput.rootElement,
+      this.priorityButton,
+      this.saveButton,
+    );
+    return element;
+  }
+}
+
+function createButton(textContent: string): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = textContent;
+  return button;
+}
+
+function createLabeledInput(id: string, labelText: string): LabeledInput {
+  const group: LabeledInput = {
+    rootElement: document.createElement("div"),
+    label: document.createElement("label"),
+    input: document.createElement("input"),
+  };
+  group.rootElement.append(group.label, group.input);
+  group.input.id = id;
+  group.label.htmlFor = id;
+  group.label.textContent = labelText;
+
+  return group;
 }
 
 /* ======================================================================
@@ -383,26 +426,6 @@ function handleToggleStatusClick(task: Task, card: Card): void {
   const updatedCard: Card = new CardObject(task);
   app.replaceChild(updatedCard.rootElement, card.rootElement);
   updatedCard.toggleStatusButton.focus();
-}
-
-function handleSaveTask(
-  taskName: string,
-  priority: Priority,
-  task?: Task,
-): void {
-  const name = taskName.trim();
-  if (!name) {
-    return;
-  }
-  if (task) {
-    task.name = name;
-    task.priority = priority;
-    cards.editingTaskId = null;
-  } else {
-    tasks.addTask(name, priority);
-  }
-  cards.renderAll();
-  document.getElementById("task-name")?.focus();
 }
 
 /* ======================================================================
@@ -428,14 +451,13 @@ const cards: CardLayout = {
 
   renderAll(): void {
     this.rootElement.innerHTML = "";
-    const cards = tasks.contents.map((task, index) =>
-      index === this.editingTaskId
-        ? createEditTaskForm(task)
+    const cards = tasks.contents.map((task) =>
+      task.id === this.editingTaskId
+        ? new EditTaskFormObject(task)
         : new CardObject(task),
     );
-    cards.forEach((card) => this.rootElement.appendChild(card.rootElement));
-    const form = createNewTaskForm();
-    this.rootElement.appendChild(form.rootElement);
+    cards.forEach((card) => this.rootElement.appendChild(card.render()));
+    this.rootElement.appendChild(new NewTaskFormObject().render());
   },
 };
 

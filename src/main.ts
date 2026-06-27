@@ -202,46 +202,46 @@ class CardObject implements Card {
   }
 
   createStatusElement(taskStatus: Status): HTMLParagraphElement {
-    const status = document.createElement("p");
-    status.className = "card__status";
-    status.textContent = taskStatus;
+    const element = document.createElement("p");
+    element.className = "card__status";
+    element.textContent = taskStatus;
     if (taskStatus === "completed") {
       this.heading.classList.add("line-through");
       this.rootElement.classList.add("subtle-text");
     }
-    return status;
+    return element;
   }
 
   createPriorityElement(taskPriority: Priority): HTMLParagraphElement {
-    const priority = document.createElement("p");
-    priority.className = "priority";
-    priority.textContent = `${taskPriority}`;
-    priority.classList.add(`priority-${taskPriority}`);
-    return priority;
+    const element = document.createElement("p");
+    element.className = "priority";
+    element.textContent = `${taskPriority}`;
+    element.classList.add(`priority-${taskPriority}`);
+    return element;
   }
 
   createToggleStatusButton(task: Task): HTMLButtonElement {
-    const toggleStatusButton = document.createElement("button");
-    toggleStatusButton.className = "card__toggle-status icon button";
-    toggleStatusButton.textContent = `${task.status === "completed" ? "\u21b6" : "\u2714"}`;
-    toggleStatusButton.ariaLabel = `${task.status === "completed" ? "set task to pending" : "set task to completed"}`;
+    const button = document.createElement("button");
+    button.className = "card__toggle-status icon button";
+    button.textContent = `${task.status === "completed" ? "\u21b6" : "\u2714"}`;
+    button.ariaLabel = `${task.status === "completed" ? "set task to pending" : "set task to completed"}`;
 
-    toggleStatusButton.addEventListener("click", () => {
-      handleToggleStatusClick(task, this);
+    button.addEventListener("click", () => {
+      handleToggleStatusButtonClick(task, this);
     });
-    return toggleStatusButton;
+
+    return button;
   }
   createEditTaskButton(): HTMLButtonElement {
-    const editTaskButton = document.createElement("button");
-    editTaskButton.className = "card__edit-task icon button";
-    editTaskButton.textContent = "\u270e";
-    editTaskButton.ariaLabel = "Edit task";
-    editTaskButton.addEventListener("click", () => {
-      cards.editingTaskId = this.taskId;
-      cards.renderAll();
-      document.getElementById("task-name")?.focus();
+    const button = document.createElement("button");
+    button.className = "card__edit-task icon button";
+    button.textContent = "\u270e";
+    button.ariaLabel = "Edit task";
+    button.addEventListener("click", () => {
+      handleEditTaskButtonClick(this.taskId);
     });
-    return editTaskButton;
+
+    return button;
   }
 
   render(): HTMLElement {
@@ -295,10 +295,7 @@ class NewTaskFormObject implements NewTaskForm {
     button.dataset["type"] = "dashed-border";
 
     button.addEventListener("click", () => {
-      priority = (1 + (priority % 5)) as Priority;
-      button.priority = priority;
-      button.textContent = `${button.priority}`;
-      button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
+      handlePriorityButtonClick(priority, button);
     });
 
     return button;
@@ -310,20 +307,10 @@ class NewTaskFormObject implements NewTaskForm {
     saveButton.dataset["type"] = "dashed-border";
 
     saveButton.addEventListener("click", () => {
-      this.handleSaveButtonClick();
+      handleSaveButtonClick(this);
     });
 
     return saveButton;
-  }
-
-  handleSaveButtonClick(): void {
-    const name = this.taskNameInput.input.value.trim();
-    if (!name) {
-      return;
-    }
-    tasks.addTask(name, this.priorityButton.priority);
-    cards.renderAll();
-    document.getElementById("task-name")?.focus();
   }
 
   render(): HTMLElement {
@@ -364,22 +351,10 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     deleteButton.ariaLabel = "Delete task";
 
     deleteButton.addEventListener("click", () => {
-      tasks.deleteTask(this.task.id);
-      cards.renderAll();
+      handleDeleteButtonClick(this.task.id);
     });
 
     return deleteButton;
-  }
-
-  override handleSaveButtonClick(): void {
-    const name = this.taskNameInput.input.value.trim();
-    if (!name) {
-      return;
-    }
-    this.task.name = name;
-    this.task.priority = this.priorityButton.priority as Priority;
-    cards.editingTaskId = null;
-    cards.renderAll();
   }
 
   override render(): HTMLElement {
@@ -418,7 +393,7 @@ function createLabeledInput(id: string, labelText: string): LabeledInput {
  * Event Handling
  * ======================================================================
  */
-function handleToggleStatusClick(task: Task, card: Card): void {
+function handleToggleStatusButtonClick(task: Task, card: Card): void {
   task.toggleStatus();
   if (!app) {
     return;
@@ -428,6 +403,43 @@ function handleToggleStatusClick(task: Task, card: Card): void {
   updatedCard.toggleStatusButton.focus();
 }
 
+function handleEditTaskButtonClick(taskId: TaskId): void {
+  cards.editingTaskId = taskId;
+  cards.renderAll();
+  document.getElementById("task-name")?.focus();
+}
+
+function handlePriorityButtonClick(priority: Priority, button: PriorityButton) {
+  priority = (1 + (priority % 5)) as Priority;
+  button.priority = priority;
+  button.textContent = `${button.priority}`;
+  button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
+}
+
+function handleSaveButtonClick(
+  form: NewTaskForm | EditTaskForm,
+  task?: Task,
+): void {
+  const name = form.taskNameInput.input.value.trim();
+  if (!name) {
+    return;
+  }
+  if (task) {
+    task.name = name;
+    task.priority = form.priorityButton.priority as Priority;
+    cards.editingTaskId = null;
+  } else {
+    tasks.addTask(name, form.priorityButton.priority);
+    cards.renderAll();
+    document.getElementById("task-name")?.focus();
+  }
+  cards.renderAll();
+}
+
+function handleDeleteButtonClick(taskId: TaskId): void {
+  tasks.deleteTask(taskId);
+  cards.renderAll();
+}
 /* ======================================================================
  * Rendering
  * ======================================================================

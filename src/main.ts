@@ -268,6 +268,7 @@ class NewTaskFormObject implements NewTaskForm {
     this.taskNameInput = this.createTaskNameInput();
     this.priorityButton = this.createPriorityButton();
     this.saveButton = this.createSaveButton();
+    this.addSaveEventListener();
   }
 
   createRootElement(): HTMLDivElement {
@@ -306,11 +307,13 @@ class NewTaskFormObject implements NewTaskForm {
     saveButton.className = "form__save button";
     saveButton.dataset["type"] = "dashed-border";
 
-    saveButton.addEventListener("click", () => {
+    return saveButton;
+  }
+
+  addSaveEventListener(): void {
+    this.saveButton.addEventListener("click", () => {
       handleSaveButtonClick(this);
     });
-
-    return saveButton;
   }
 
   render(): HTMLElement {
@@ -357,6 +360,12 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     return deleteButton;
   }
 
+  override addSaveEventListener(): void {
+    this.saveButton.addEventListener("click", () => {
+      handleSaveButtonClick(this, this.task);
+    });
+  }
+
   override render(): HTMLElement {
     const element = this.rootElement;
     element.append(
@@ -395,11 +404,9 @@ function createLabeledInput(id: string, labelText: string): LabeledInput {
  */
 function handleToggleStatusButtonClick(task: Task, card: Card): void {
   task.toggleStatus();
-  if (!app) {
-    return;
-  }
   const updatedCard: Card = new CardObject(task);
-  app.replaceChild(updatedCard.rootElement, card.rootElement);
+  cards.rootElement.replaceChild(updatedCard.rootElement, card.rootElement);
+  updatedCard.render();
   updatedCard.toggleStatusButton.focus();
 }
 
@@ -428,12 +435,12 @@ function handleSaveButtonClick(
     task.name = name;
     task.priority = form.priorityButton.priority as Priority;
     cards.editingTaskId = null;
+    cards.renderAll();
   } else {
     tasks.addTask(name, form.priorityButton.priority);
     cards.renderAll();
     document.getElementById("task-name")?.focus();
   }
-  cards.renderAll();
 }
 
 function handleDeleteButtonClick(taskId: TaskId): void {
@@ -473,7 +480,5 @@ const cards: CardLayout = {
   },
 };
 
-const app = document.querySelector("#app");
-app?.classList.add("grid");
-
+cards.styleRootElement();
 cards.renderAll();

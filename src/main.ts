@@ -222,6 +222,7 @@ class CardObject implements Card {
 
   createToggleStatusButton(task: Task): HTMLButtonElement {
     const button = document.createElement("button");
+    button.id = `toggle-status-${this.taskId}`;
     button.className = "card__toggle-status icon button";
     button.textContent = `${task.status === "completed" ? "\u21b6" : "\u2714"}`;
     button.ariaLabel = `${task.status === "completed" ? "set task to pending" : "set task to completed"}`;
@@ -234,6 +235,7 @@ class CardObject implements Card {
   }
   createEditTaskButton(): HTMLButtonElement {
     const button = document.createElement("button");
+    button.id = `edit-task-${this.taskId}`;
     button.className = "card__edit-task icon button";
     button.textContent = "\u270e";
     button.ariaLabel = "Edit task";
@@ -372,6 +374,7 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
       this.taskNameInput.rootElement,
       this.priorityButton,
       this.saveButton,
+      this.deleteButton,
     );
     return element;
   }
@@ -455,6 +458,7 @@ function handleDeleteButtonClick(taskId: TaskId): void {
 interface CardLayout {
   rootElement: HTMLDivElement;
   editingTaskId: TaskId | null;
+  lastFocusId: string | undefined;
 
   styleRootElement(): void;
   renderAll(): void;
@@ -463,12 +467,16 @@ interface CardLayout {
 const cards: CardLayout = {
   rootElement: document.querySelector("#app") as HTMLDivElement,
   editingTaskId: null,
+  lastFocusId: document.activeElement?.id,
 
   styleRootElement(): void {
     this.rootElement.classList.add("grid");
   },
 
   renderAll(): void {
+    const focusId: string | undefined = document.activeElement?.id;
+    this.lastFocusId = focusId ? focusId : this.lastFocusId;
+    console.log(focusId);
     this.rootElement.innerHTML = "";
     const cards = tasks.contents.map((task) =>
       task.id === this.editingTaskId
@@ -477,6 +485,10 @@ const cards: CardLayout = {
     );
     cards.forEach((card) => this.rootElement.appendChild(card.render()));
     this.rootElement.appendChild(new NewTaskFormObject().render());
+    console.log(focusId);
+    if (this.lastFocusId) {
+      document.getElementById(this.lastFocusId)?.focus();
+    }
   },
 };
 

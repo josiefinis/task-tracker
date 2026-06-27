@@ -139,12 +139,12 @@ interface Card {
 interface NewTaskForm {
   rootElement: HTMLDivElement;
   taskNameInput: LabeledInput;
-  priorityButton: PriorityButton;
+  priorityButton: HTMLButtonElement;
   saveButton: HTMLButtonElement;
 
   createRootElement(): HTMLDivElement;
   createTaskNameInput(): LabeledInput;
-  createPriorityButton(priority?: Priority): PriorityButton;
+  createPriorityButton(priority?: Priority): HTMLButtonElement;
   createSaveButton(): HTMLButtonElement;
   render(): HTMLElement;
 }
@@ -162,10 +162,6 @@ interface LabeledInput {
   rootElement: HTMLDivElement;
   label: HTMLLabelElement;
   input: HTMLInputElement;
-}
-
-interface PriorityButton extends HTMLButtonElement {
-  priority?: Priority;
 }
 
 class CardObject implements Card {
@@ -262,7 +258,7 @@ class CardObject implements Card {
 class NewTaskFormObject implements NewTaskForm {
   rootElement: HTMLDivElement;
   taskNameInput: LabeledInput;
-  priorityButton: PriorityButton;
+  priorityButton: HTMLButtonElement;
   saveButton: HTMLButtonElement;
 
   constructor() {
@@ -290,15 +286,14 @@ class NewTaskFormObject implements NewTaskForm {
     return taskNameInput;
   }
 
-  createPriorityButton(priority: Priority = 1): PriorityButton {
-    const button: PriorityButton = createButton(`${priority}`);
-    button.priority = priority;
+  createPriorityButton(priority: Priority = 1): HTMLButtonElement {
+    const button: HTMLButtonElement = createButton(`${priority}`);
     button.className = "priority icon button";
     button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
     button.dataset["type"] = "dashed-border";
 
     button.addEventListener("click", () => {
-      handlePriorityButtonClick(priority, button);
+      handlePriorityButtonClick(button);
     });
 
     return button;
@@ -419,10 +414,11 @@ function handleEditTaskButtonClick(taskId: TaskId): void {
   document.getElementById("task-name")?.focus();
 }
 
-function handlePriorityButtonClick(priority: Priority, button: PriorityButton) {
-  priority = (1 + (priority % 5)) as Priority;
-  button.priority = priority;
-  button.textContent = `${button.priority}`;
+function handlePriorityButtonClick(button: HTMLButtonElement) {
+  let priority = button.textContent as unknown as number;
+  priority %= 5;
+  priority++;
+  button.textContent = `${priority}`;
   button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
 }
 
@@ -434,13 +430,14 @@ function handleSaveButtonClick(
   if (!name) {
     return;
   }
+  const priority = form.priorityButton.textContent as unknown as Priority;
   if (task) {
     task.name = name;
-    task.priority = form.priorityButton.priority as Priority;
+    task.priority = priority;
     cards.editingTaskId = null;
     cards.renderAll();
   } else {
-    tasks.addTask(name, form.priorityButton.priority);
+    tasks.addTask(name, priority);
     cards.renderAll();
     document.getElementById("task-name")?.focus();
   }

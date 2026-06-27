@@ -133,6 +133,8 @@ interface Card {
   createPriorityElement(taskPriority: Priority): HTMLParagraphElement;
   createToggleStatusButton(task: Task): HTMLButtonElement;
   createEditTaskButton(): HTMLButtonElement;
+  addToggleStatusClickListener(task: Task): void;
+  addEditTaskClickListener(): void;
   render(): HTMLElement;
 }
 
@@ -146,6 +148,8 @@ interface NewTaskForm {
   createTaskNameInput(): LabeledInput;
   createPriorityButton(priority?: Priority): HTMLButtonElement;
   createSaveButton(): HTMLButtonElement;
+  addPriorityClickListener(): void;
+  addSaveClickListener(): void;
   render(): HTMLElement;
 }
 
@@ -156,6 +160,7 @@ interface EditTaskForm extends NewTaskForm {
 
   createDialogElement(): HTMLDialogElement;
   createDeleteButton(): HTMLButtonElement;
+  addDeleteClickListener(): void;
 }
 
 interface LabeledInput {
@@ -181,6 +186,8 @@ class CardObject implements Card {
     this.priority = this.createPriorityElement(task.priority);
     this.toggleStatusButton = this.createToggleStatusButton(task);
     this.editTaskButton = this.createEditTaskButton();
+    this.addToggleStatusClickListener(task);
+    this.addEditTaskClickListener();
   }
 
   createRootElement(): HTMLElement {
@@ -223,10 +230,6 @@ class CardObject implements Card {
     button.textContent = `${task.status === "completed" ? "\u21b6" : "\u2714"}`;
     button.ariaLabel = `${task.status === "completed" ? "set task to pending" : "set task to completed"}`;
 
-    button.addEventListener("click", () => {
-      handleToggleStatusButtonClick(task);
-    });
-
     return button;
   }
   createEditTaskButton(): HTMLButtonElement {
@@ -235,11 +238,20 @@ class CardObject implements Card {
     button.className = "card__edit-task icon button";
     button.textContent = "\u270e";
     button.ariaLabel = "Edit task";
-    button.addEventListener("click", () => {
-      handleEditTaskButtonClick(this.taskId);
-    });
 
     return button;
+  }
+
+  addToggleStatusClickListener(task: Task): void {
+    this.toggleStatusButton.addEventListener("click", () => {
+      handleToggleStatusButtonClick(task);
+    });
+  }
+
+  addEditTaskClickListener(): void {
+    this.editTaskButton.addEventListener("click", () => {
+      handleEditTaskButtonClick(this.taskId);
+    });
   }
 
   render(): HTMLElement {
@@ -266,7 +278,8 @@ class NewTaskFormObject implements NewTaskForm {
     this.taskNameInput = this.createTaskNameInput();
     this.priorityButton = this.createPriorityButton();
     this.saveButton = this.createSaveButton();
-    this.addSaveEventListener();
+    this.addPriorityClickListener();
+    this.addSaveClickListener();
   }
 
   createRootElement(): HTMLDivElement {
@@ -277,7 +290,7 @@ class NewTaskFormObject implements NewTaskForm {
   }
 
   createTaskNameInput(): LabeledInput {
-    const taskNameInput = createLabeledInput("task-name", "Task name");
+    const taskNameInput = createLabeledInput("new-task-name", "Task name");
     taskNameInput.rootElement.className = "form__input-group";
     taskNameInput.input.className = "form__input task-name";
     taskNameInput.label.className = "visually-hidden";
@@ -291,11 +304,6 @@ class NewTaskFormObject implements NewTaskForm {
     button.className = "priority icon button";
     button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
     button.dataset["type"] = "dashed-border";
-
-    button.addEventListener("click", () => {
-      handlePriorityButtonClick(button);
-    });
-
     return button;
   }
 
@@ -307,7 +315,13 @@ class NewTaskFormObject implements NewTaskForm {
     return saveButton;
   }
 
-  addSaveEventListener(): void {
+  addPriorityClickListener(): void {
+    this.priorityButton.addEventListener("click", () => {
+      handlePriorityButtonClick(this.priorityButton);
+    });
+  }
+
+  addSaveClickListener(): void {
     this.saveButton.addEventListener("click", () => {
       handleSaveButtonClick(this);
     });
@@ -335,7 +349,10 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     this.dialog = this.createDialogElement();
     this.priorityButton = this.createPriorityButton(task.priority);
     this.deleteButton = this.createDeleteButton();
+    this.taskNameInput.input.id = "edit-task-name";
     this.taskNameInput.input.value = task.name;
+    this.addDeleteClickListener();
+    this.addPriorityClickListener();
 
     this.rootElement.appendChild(this.deleteButton);
   }
@@ -350,16 +367,18 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     deleteButton.className = "form__delete icon button";
     deleteButton.ariaLabel = "Delete task";
 
-    deleteButton.addEventListener("click", () => {
-      handleDeleteButtonClick(this.task.id);
-    });
-
     return deleteButton;
   }
 
-  override addSaveEventListener(): void {
+  override addSaveClickListener(): void {
     this.saveButton.addEventListener("click", () => {
       handleSaveButtonClick(this, this.task);
+    });
+  }
+
+  addDeleteClickListener(): void {
+    this.deleteButton.addEventListener("click", () => {
+      handleDeleteButtonClick(this.task.id);
     });
   }
 
@@ -408,7 +427,7 @@ function handleToggleStatusButtonClick(task: Task): void {
 function handleEditTaskButtonClick(taskId: TaskId): void {
   cards.editingTaskId = taskId;
   cards.renderAll();
-  document.getElementById("task-name")?.focus();
+  document.getElementById("edit-task-name")?.focus();
 }
 
 function handlePriorityButtonClick(button: HTMLButtonElement) {
@@ -436,7 +455,7 @@ function handleSaveButtonClick(
   } else {
     tasks.addTask(name, priority);
     cards.renderAll();
-    document.getElementById("task-name")?.focus();
+    document.getElementById("new-task-name")?.focus();
   }
 }
 

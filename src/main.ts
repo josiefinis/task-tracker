@@ -104,17 +104,6 @@ const tasks: TaskList = {
 };
 
 /* ======================================================================
- * Create some tasks for demonstration purposes. */
-tasks.addTask("meet with CTO", 5);
-tasks.addTask("client lunch", 3, "", "lights");
-tasks.addTask("investors call");
-tasks.addTask("give keynote", 4);
-tasks.addTask("board meeting", 4);
-tasks.addTask("book flights", 2);
-/* ======================================================================
- */
-
-/* ======================================================================
  * Render Tasks as Cards
  * ======================================================================
  */
@@ -193,34 +182,33 @@ class CardObject implements Card {
   createRootElement(): HTMLElement {
     const rootElement = document.createElement("article");
     rootElement.className = "card | grid container";
-
     return rootElement;
   }
 
   createHeadingElement(taskName: string): HTMLHeadingElement {
-    const heading = document.createElement("h2");
-    heading.className = "card__heading task-name";
-    heading.textContent = taskName;
-    return heading;
+    const headingElement = document.createElement("h2");
+    headingElement.className = "card__heading task-name";
+    headingElement.textContent = taskName;
+    return headingElement;
   }
 
   createStatusElement(taskStatus: Status): HTMLParagraphElement {
-    const element = document.createElement("p");
-    element.className = "card__status";
-    element.textContent = taskStatus;
+    const statusElement = document.createElement("p");
+    statusElement.className = "card__status";
+    statusElement.textContent = taskStatus;
     if (taskStatus === "completed") {
       this.heading.classList.add("line-through");
       this.rootElement.classList.add("subtle-text");
     }
-    return element;
+    return statusElement;
   }
 
   createPriorityElement(taskPriority: Priority): HTMLParagraphElement {
-    const element = document.createElement("p");
-    element.className = "priority";
-    element.textContent = `${taskPriority}`;
-    element.classList.add(`priority-${taskPriority}`);
-    return element;
+    const priorityElement = document.createElement("p");
+    priorityElement.className = "priority";
+    priorityElement.textContent = `${taskPriority}`;
+    priorityElement.classList.add(`priority-${taskPriority}`);
+    return priorityElement;
   }
 
   createToggleStatusButton(task: Task): HTMLButtonElement {
@@ -255,15 +243,15 @@ class CardObject implements Card {
   }
 
   render(): HTMLElement {
-    const element = this.rootElement;
-    element.append(
+    const rootElement = this.rootElement;
+    rootElement.append(
       this.heading,
       this.status,
       this.priority,
       this.editTaskButton,
       this.toggleStatusButton,
     );
-    return element;
+    return rootElement;
   }
 }
 
@@ -290,13 +278,13 @@ class NewTaskFormObject implements NewTaskForm {
   }
 
   createTaskNameInput(): LabeledInput {
-    const taskNameInput = createLabeledInput("new-task-name", "Task name");
-    taskNameInput.rootElement.className = "form__input-group";
-    taskNameInput.input.className = "form__input task-name";
-    taskNameInput.label.className = "visually-hidden";
-    taskNameInput.input.placeholder = "New task...";
-    taskNameInput.input.dataset["type"] = "dashed-border";
-    return taskNameInput;
+    const input = createLabeledInput("new-task-name", "Task name");
+    input.rootElement.className = "form__input-group";
+    input.input.className = "form__input task-name";
+    input.label.className = "visually-hidden";
+    input.input.placeholder = "New task...";
+    input.input.dataset["type"] = "dashed-border";
+    return input;
   }
 
   createPriorityButton(priority: Priority = 1): HTMLButtonElement {
@@ -308,11 +296,11 @@ class NewTaskFormObject implements NewTaskForm {
   }
 
   createSaveButton(): HTMLButtonElement {
-    const saveButton = createButton("Save");
-    saveButton.className = "form__save button";
-    saveButton.dataset["type"] = "dashed-border";
+    const button = createButton("Save");
+    button.className = "form__save button";
+    button.dataset["type"] = "dashed-border";
 
-    return saveButton;
+    return button;
   }
 
   addPriorityClickListener(): void {
@@ -328,13 +316,13 @@ class NewTaskFormObject implements NewTaskForm {
   }
 
   render(): HTMLElement {
-    const element = this.rootElement;
-    element.append(
+    const rootElement = this.rootElement;
+    rootElement.append(
       this.taskNameInput.rootElement,
       this.priorityButton,
       this.saveButton,
     );
-    return element;
+    return rootElement;
   }
 }
 
@@ -358,16 +346,16 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
   }
 
   createDialogElement(): HTMLDialogElement {
-    const dialogElement = document.createElement("dialog");
-    return dialogElement;
+    const dialog = document.createElement("dialog");
+    return dialog;
   }
 
   createDeleteButton(): HTMLButtonElement {
-    const deleteButton = createButton("\u{1F5D1}");
-    deleteButton.className = "form__delete icon button";
-    deleteButton.ariaLabel = "Delete task";
+    const button = createButton("\u{1F5D1}");
+    button.className = "form__delete icon button";
+    button.ariaLabel = "Delete task";
 
-    return deleteButton;
+    return button;
   }
 
   override addSaveClickListener(): void {
@@ -383,17 +371,21 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
   }
 
   override render(): HTMLElement {
-    const element = this.rootElement;
-    element.append(
+    const rootElement = this.rootElement;
+    rootElement.append(
       this.taskNameInput.rootElement,
       this.priorityButton,
       this.saveButton,
       this.deleteButton,
     );
-    return element;
+    return rootElement;
   }
 }
 
+/* ======================================================================
+ * Helper functions
+ * ======================================================================
+ */
 function createButton(textContent: string): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
@@ -463,11 +455,11 @@ function handleDeleteButtonClick(taskId: TaskId): void {
   tasks.deleteTask(taskId);
   cards.renderAll();
 }
+
 /* ======================================================================
  * Rendering
  * ======================================================================
  */
-
 interface CardLayout {
   rootElement: HTMLDivElement;
   editingTaskId: TaskId | null;
@@ -502,6 +494,17 @@ const cards: CardLayout = {
     }
   },
 };
+
+/* ======================================================================
+ * Create some tasks for demonstration purposes. */
+tasks.addTask("meet with CTO", 5);
+tasks.addTask("client lunch", 3, "", "lights");
+tasks.addTask("investors call");
+tasks.addTask("give keynote", 4);
+tasks.addTask("board meeting", 4);
+tasks.addTask("book flights", 2);
+/* ======================================================================
+ */
 
 cards.styleRootElement();
 cards.renderAll();

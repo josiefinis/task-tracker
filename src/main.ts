@@ -290,7 +290,7 @@ class NewTaskFormObject implements NewTaskForm {
   createPriorityButton(priority: Priority = 1): HTMLButtonElement {
     const button: HTMLButtonElement = createButton(`${priority}`);
     button.className = "priority icon button";
-    button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
+    button.ariaLabel = `Change priority to ${incrementPriority(priority)}`;
     button.dataset["type"] = "dashed-border";
     return button;
   }
@@ -407,6 +407,20 @@ function createLabeledInput(id: string, labelText: string): LabeledInput {
   return group;
 }
 
+function toPriority(value: string | number): Priority {
+  if ([1, 2, 3, 4, 5].includes(+value)) {
+    return value as Priority;
+  } else {
+    throw new Error(`Can not convert ${value} to type Priority.`);
+  }
+}
+
+function incrementPriority(priority: Priority): Priority {
+  priority %= 5;
+  priority++;
+  return toPriority(priority);
+}
+
 /* ======================================================================
  * Event Handling
  * ======================================================================
@@ -423,11 +437,10 @@ function handleEditTaskButtonClick(taskId: TaskId): void {
 }
 
 function handlePriorityButtonClick(button: HTMLButtonElement) {
-  let priority = button.textContent as unknown as number;
-  priority %= 5;
-  priority++;
+  let priority = toPriority(button.textContent);
+  priority = incrementPriority(priority);
   button.textContent = `${priority}`;
-  button.ariaLabel = `Change priority to ${(priority % 5) + 1}`;
+  button.ariaLabel = `Change priority to ${incrementPriority(priority)}`;
 }
 
 function handleSaveButtonClick(
@@ -438,7 +451,7 @@ function handleSaveButtonClick(
   if (!name) {
     return;
   }
-  const priority = form.priorityButton.textContent as unknown as Priority;
+  const priority = toPriority(form.priorityButton.textContent);
   if (task) {
     task.name = name;
     task.priority = priority;

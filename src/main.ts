@@ -128,17 +128,17 @@ interface Card {
 }
 
 interface NewTaskForm {
-  rootElement: HTMLDivElement;
+  rootElement: HTMLFormElement;
   taskNameInput: LabeledInput;
   priorityButton: HTMLButtonElement;
   saveButton: HTMLButtonElement;
 
-  createRootElement(): HTMLDivElement;
+  createRootElement(): HTMLFormElement;
   createTaskNameInput(): LabeledInput;
   createPriorityButton(priority?: Priority): HTMLButtonElement;
   createSaveButton(): HTMLButtonElement;
   addPriorityClickListener(): void;
-  addSaveClickListener(): void;
+  handleSubmit(event: Event): void;
   render(): HTMLElement;
 }
 
@@ -256,7 +256,7 @@ class CardObject implements Card {
 }
 
 class NewTaskFormObject implements NewTaskForm {
-  rootElement: HTMLDivElement;
+  rootElement: HTMLFormElement;
   taskNameInput: LabeledInput;
   priorityButton: HTMLButtonElement;
   saveButton: HTMLButtonElement;
@@ -267,11 +267,13 @@ class NewTaskFormObject implements NewTaskForm {
     this.priorityButton = this.createPriorityButton();
     this.saveButton = this.createSaveButton();
     this.addPriorityClickListener();
-    this.addSaveClickListener();
+    this.rootElement.addEventListener("submit", (e) => {
+      this.handleSubmit(e);
+    });
   }
 
-  createRootElement(): HTMLDivElement {
-    const rootElement = document.createElement("div");
+  createRootElement(): HTMLFormElement {
+    const rootElement = document.createElement("form");
     rootElement.className = "form card | grid container";
     rootElement.dataset["type"] = "dashed-border";
     return rootElement;
@@ -297,6 +299,7 @@ class NewTaskFormObject implements NewTaskForm {
 
   createSaveButton(): HTMLButtonElement {
     const button = createButton("Save");
+    button.type = "submit";
     button.className = "form__save button";
     button.dataset["type"] = "dashed-border";
 
@@ -309,10 +312,17 @@ class NewTaskFormObject implements NewTaskForm {
     });
   }
 
-  addSaveClickListener(): void {
-    this.saveButton.addEventListener("click", () => {
-      handleSaveButtonClick(this);
-    });
+  handleSubmit(event: Event): void {
+    event.preventDefault();
+    const name = this.taskNameInput.input.value.trim();
+    if (!name) {
+      // display error message
+      return;
+    }
+    const priority = toPriority(this.priorityButton.textContent);
+    tasks.addTask(name, priority);
+    cards.renderAll();
+    document.getElementById("new-task-name")?.focus();
   }
 
   render(): HTMLElement {
@@ -358,10 +368,18 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     return button;
   }
 
-  override addSaveClickListener(): void {
-    this.saveButton.addEventListener("click", () => {
-      handleSaveButtonClick(this, this.task);
-    });
+  override handleSubmit(event: Event): void {
+    event.preventDefault();
+    const name = this.taskNameInput.input.value.trim();
+    if (!name) {
+      // display error message.
+      return;
+    }
+    const priority = toPriority(this.priorityButton.textContent);
+    this.task.name = name;
+    this.task.priority = priority;
+    cards.editingTaskId = null;
+    cards.renderAll();
   }
 
   addDeleteClickListener(): void {
@@ -443,27 +461,6 @@ function handlePriorityButtonClick(button: HTMLButtonElement) {
   button.ariaLabel = `Change priority to ${incrementPriority(priority)}`;
 }
 
-function handleSaveButtonClick(
-  form: NewTaskForm | EditTaskForm,
-  task?: Task,
-): void {
-  const name = form.taskNameInput.input.value.trim();
-  if (!name) {
-    return;
-  }
-  const priority = toPriority(form.priorityButton.textContent);
-  if (task) {
-    task.name = name;
-    task.priority = priority;
-    cards.editingTaskId = null;
-    cards.renderAll();
-  } else {
-    tasks.addTask(name, priority);
-    cards.renderAll();
-    document.getElementById("new-task-name")?.focus();
-  }
-}
-
 function handleDeleteButtonClick(taskId: TaskId): void {
   tasks.deleteTask(taskId);
   cards.renderAll();
@@ -493,6 +490,7 @@ const cards: CardLayout = {
 
   renderAll(): void {
     const focusId: string | undefined = document.activeElement?.id;
+    console.log(focusId);
     this.lastFocusId = focusId ? focusId : this.lastFocusId;
     this.rootElement.innerHTML = "";
     const cards = tasks.contents.map((task) =>

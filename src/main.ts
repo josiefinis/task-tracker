@@ -383,6 +383,7 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     this.task.priority = priority;
     cards.editingTaskId = null;
     cards.renderAll();
+    document.getElementById(`edit-task-${this.task.id}`)?.focus();
   }
 
   addDeleteClickListener(): void {
@@ -486,7 +487,6 @@ function handleDeleteButtonClick(taskId: TaskId): void {
 interface CardLayout {
   rootElement: HTMLDivElement;
   editingTaskId: TaskId | null;
-  lastFocusId: string | undefined;
 
   styleRootElement(): void;
   renderAll(): void;
@@ -495,7 +495,6 @@ interface CardLayout {
 const cards: CardLayout = {
   rootElement: document.querySelector("#app") as HTMLDivElement,
   editingTaskId: null,
-  lastFocusId: document.activeElement?.id,
 
   styleRootElement(): void {
     this.rootElement.classList.add("grid");
@@ -503,8 +502,6 @@ const cards: CardLayout = {
 
   renderAll(): void {
     const focusId: string | undefined = document.activeElement?.id;
-    console.log(focusId);
-    this.lastFocusId = focusId ? focusId : this.lastFocusId;
     this.rootElement.innerHTML = "";
     const cards = tasks.contents.map((task) =>
       task.id === this.editingTaskId
@@ -513,8 +510,8 @@ const cards: CardLayout = {
     );
     cards.forEach((card) => this.rootElement.appendChild(card.render()));
     this.rootElement.appendChild(new NewTaskFormObject().render());
-    if (this.lastFocusId) {
-      document.getElementById(this.lastFocusId)?.focus();
+    if (focusId) {
+      document.getElementById(focusId)?.focus();
     }
   },
 };

@@ -40,11 +40,16 @@
   --white: oklch(100% 0 0);
   --black: oklch(0 0 0);
 
+  /* Utility Colors */
+  --red: oklch(0.628 0.2577 29.23);
+  --light-red: oklch(0.6691 0.2146 29.23);
+
   /* Semantic Colors */
   --clr-accent: light-dark(var(--pink-800), var(--pink-200));
   --clr-background: light-dark(var(--pink-100), var(--pink-950));
   --clr-subtle-text: light-dark(var(--gray-600), var(--gray-300));
   --clr-shadow: light-dark(var(--gray-400), var(--black));
+  --clr-error-message: light-dark(var(--red), var(--light-red));
 
   --clr-priority-1: oklch(0.54 0.2187 260 / 0.5);
   --clr-priority-2: oklch(0.54 0.2187 285 / 0.5);
@@ -226,6 +231,16 @@ input {
   border: 0;
 }
 
+.error-message {
+  color: var(--clr-error-message);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--fluid-font-size-m);
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
 /* ======================================================================
  * BLOCKS
  * ======================================================================
@@ -258,7 +273,6 @@ input {
     2px 2px 2px var(--clr-shadow),
     -2px 2px 2px var(--clr-shadow);
   padding: 1rem;
-
 }
 
 .task-name {
@@ -299,7 +313,7 @@ input {
 }
 
 .form.card {
-  opacity: 0.4;
+  opacity: 1;
 }
 
 .form {

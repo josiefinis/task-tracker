@@ -156,6 +156,7 @@ interface LabeledInput {
   rootElement: HTMLDivElement;
   label: HTMLLabelElement;
   input: HTMLInputElement;
+  errorMessage: HTMLParagraphElement;
 }
 
 class CardObject implements Card {
@@ -198,7 +199,7 @@ class CardObject implements Card {
     statusElement.textContent = taskStatus;
     if (taskStatus === "completed") {
       this.heading.classList.add("line-through");
-      this.rootElement.classList.add("subtle-text");
+      this.rootElement.classList.add("opacity-50");
     }
     return statusElement;
   }
@@ -315,8 +316,9 @@ class NewTaskFormObject implements NewTaskForm {
   handleSubmit(event: Event): void {
     event.preventDefault();
     const name = this.taskNameInput.input.value.trim();
-    if (!name) {
-      // display error message
+    const errorMessage = validateTaskName(name);
+    if (errorMessage) {
+      this.taskNameInput.errorMessage.textContent = errorMessage;
       return;
     }
     const priority = toPriority(this.priorityButton.textContent);
@@ -371,8 +373,9 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
   override handleSubmit(event: Event): void {
     event.preventDefault();
     const name = this.taskNameInput.input.value.trim();
-    if (!name) {
-      // display error message.
+    const errorMessage = validateTaskName(name);
+    if (errorMessage) {
+      this.taskNameInput.errorMessage.textContent = errorMessage;
       return;
     }
     const priority = toPriority(this.priorityButton.textContent);
@@ -416,11 +419,13 @@ function createLabeledInput(id: string, labelText: string): LabeledInput {
     rootElement: document.createElement("div"),
     label: document.createElement("label"),
     input: document.createElement("input"),
+    errorMessage: document.createElement("p"),
   };
-  group.rootElement.append(group.label, group.input);
+  group.rootElement.append(group.label, group.input, group.errorMessage);
   group.input.id = id;
   group.label.htmlFor = id;
   group.label.textContent = labelText;
+  group.errorMessage.classList.add("error-message");
 
   return group;
 }
@@ -439,6 +444,14 @@ function incrementPriority(priority: Priority): Priority {
   return toPriority(priority);
 }
 
+function validateTaskName(name: string): string {
+  const errorMessage: string = !name
+    ? "Task name is required."
+    : name.length > 30
+      ? "Task name should be no more than 30 characters"
+      : "";
+  return errorMessage;
+}
 /* ======================================================================
  * Event Handling
  * ======================================================================

@@ -85,7 +85,7 @@ class CardObject {
         statusElement.textContent = taskStatus;
         if (taskStatus === "completed") {
             this.heading.classList.add("line-through");
-            this.rootElement.classList.add("subtle-text");
+            this.rootElement.classList.add("opacity-50");
         }
         return statusElement;
     }
@@ -139,10 +139,12 @@ class NewTaskFormObject {
         this.priorityButton = this.createPriorityButton();
         this.saveButton = this.createSaveButton();
         this.addPriorityClickListener();
-        this.addSaveClickListener();
+        this.rootElement.addEventListener("submit", (e) => {
+            this.handleSubmit(e);
+        });
     }
     createRootElement() {
-        const rootElement = document.createElement("div");
+        const rootElement = document.createElement("form");
         rootElement.className = "form card | grid container";
         rootElement.dataset["type"] = "dashed-border";
         return rootElement;
@@ -165,6 +167,7 @@ class NewTaskFormObject {
     }
     createSaveButton() {
         const button = createButton("Save");
+        button.type = "submit";
         button.className = "form__save button";
         button.dataset["type"] = "dashed-border";
         return button;
@@ -174,10 +177,18 @@ class NewTaskFormObject {
             handlePriorityButtonClick(this.priorityButton);
         });
     }
-    addSaveClickListener() {
-        this.saveButton.addEventListener("click", () => {
-            handleSaveButtonClick(this);
-        });
+    handleSubmit(event) {
+        event.preventDefault();
+        const name = this.taskNameInput.input.value.trim();
+        const errorMessage = validateTaskName(name);
+        if (errorMessage) {
+            this.taskNameInput.errorMessage.textContent = errorMessage;
+            return;
+        }
+        const priority = toPriority(this.priorityButton.textContent);
+        tasks.addTask(name, priority);
+        cards.renderAll();
+        document.getElementById("new-task-name")?.focus();
     }
     render() {
         const rootElement = this.rootElement;
@@ -211,10 +222,20 @@ class EditTaskFormObject extends NewTaskFormObject {
         button.ariaLabel = "Delete task";
         return button;
     }
-    addSaveClickListener() {
-        this.saveButton.addEventListener("click", () => {
-            handleSaveButtonClick(this, this.task);
-        });
+    handleSubmit(event) {
+        event.preventDefault();
+        const name = this.taskNameInput.input.value.trim();
+        const errorMessage = validateTaskName(name);
+        if (errorMessage) {
+            this.taskNameInput.errorMessage.textContent = errorMessage;
+            return;
+        }
+        const priority = toPriority(this.priorityButton.textContent);
+        this.task.name = name;
+        this.task.priority = priority;
+        cards.editingTaskId = null;
+        cards.renderAll();
+        document.getElementById(`edit-task-${this.task.id}`)?.focus();
     }
     addDeleteClickListener() {
         this.deleteButton.addEventListener("click", () => {
@@ -242,11 +263,13 @@ function createLabeledInput(id, labelText) {
         rootElement: document.createElement("div"),
         label: document.createElement("label"),
         input: document.createElement("input"),
+        errorMessage: document.createElement("p"),
     };
-    group.rootElement.append(group.label, group.input);
+    group.rootElement.append(group.label, group.input, group.errorMessage);
     group.input.id = id;
     group.label.htmlFor = id;
     group.label.textContent = labelText;
+    group.errorMessage.classList.add("error-message");
     return group;
 }
 function toPriority(value) {
@@ -261,6 +284,14 @@ function incrementPriority(priority) {
     priority %= 5;
     priority++;
     return toPriority(priority);
+}
+function validateTaskName(name) {
+    const errorMessage = !name
+        ? "Task name is required."
+        : name.length > 30
+            ? "Task name should be no more than 30 characters"
+            : "";
+    return errorMessage;
 }
 /* ======================================================================
  * Event Handling
@@ -281,24 +312,6 @@ function handlePriorityButtonClick(button) {
     button.textContent = `${priority}`;
     button.ariaLabel = `Change priority to ${incrementPriority(priority)}`;
 }
-function handleSaveButtonClick(form, task) {
-    const name = form.taskNameInput.input.value.trim();
-    if (!name) {
-        return;
-    }
-    const priority = toPriority(form.priorityButton.textContent);
-    if (task) {
-        task.name = name;
-        task.priority = priority;
-        cards.editingTaskId = null;
-        cards.renderAll();
-    }
-    else {
-        tasks.addTask(name, priority);
-        cards.renderAll();
-        document.getElementById("new-task-name")?.focus();
-    }
-}
 function handleDeleteButtonClick(taskId) {
     tasks.deleteTask(taskId);
     cards.renderAll();
@@ -306,21 +319,19 @@ function handleDeleteButtonClick(taskId) {
 const cards = {
     rootElement: document.querySelector("#app"),
     editingTaskId: null,
-    lastFocusId: document.activeElement?.id,
     styleRootElement() {
         this.rootElement.classList.add("grid");
     },
     renderAll() {
         const focusId = document.activeElement?.id;
-        this.lastFocusId = focusId ? focusId : this.lastFocusId;
         this.rootElement.innerHTML = "";
         const cards = tasks.contents.map((task) => task.id === this.editingTaskId
             ? new EditTaskFormObject(task)
             : new CardObject(task));
         cards.forEach((card) => this.rootElement.appendChild(card.render()));
         this.rootElement.appendChild(new NewTaskFormObject().render());
-        if (this.lastFocusId) {
-            document.getElementById(this.lastFocusId)?.focus();
+        if (focusId) {
+            document.getElementById(focusId)?.focus();
         }
     },
 };

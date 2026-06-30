@@ -13,8 +13,6 @@ interface Task {
   status: Status;
   description?: string;
   notes?: string;
-
-  toggleStatus(): Status;
 }
 
 interface TaskList {
@@ -29,29 +27,27 @@ interface TaskList {
   ): number;
   deleteTask(id: TaskId): void;
   getTaskById(id: TaskId): Task | undefined;
-  toggleStatus(id: TaskId): Status | undefined;
+  toggleStatus(id: TaskId): void;
   listAll(): Task[];
   listCompleted(): Task[];
   listPending(): Task[];
+  save(): void;
+  load(): void;
+  clear(): void;
 }
-
-let counter = 0;
 
 class TaskObject implements Task {
   id: TaskId;
   name: string;
   priority: Priority;
   status: Status = "pending";
+  description?: string;
+  notes?: string;
 
   constructor(name: string, priority: Priority) {
-    this.id = counter++;
+    this.id = nextId++;
     this.name = name;
     this.priority = priority;
-  }
-
-  toggleStatus(): Status {
-    this.status = this.status === "pending" ? "completed" : "pending";
-    return this.status;
   }
 }
 
@@ -73,21 +69,27 @@ const tasks: TaskList = {
       task.notes = notes;
     }
     this.length = this.contents.push(task);
+    this.save();
     return this.length;
   },
 
   deleteTask(id: TaskId): void {
     const index = this.contents.findIndex((task) => task.id === id);
     this.contents.splice(index, 1);
+    this.length = this.contents.length;
+    this.save();
   },
 
   getTaskById(id: TaskId): Task | undefined {
     return this.contents.find((task) => task.id === id);
   },
 
-  toggleStatus(id: TaskId): Status | undefined {
-    const task: Task | undefined = this.contents.find((task) => task.id === id);
-    return task ? task.toggleStatus() : undefined;
+  toggleStatus(id: TaskId): void {
+    const task: Task | undefined = this.getTaskById(id);
+    if (task) {
+      task.status = task.status === "pending" ? "completed" : "pending";
+    }
+    this.save();
   },
 
   listAll(): Task[] {
@@ -100,6 +102,26 @@ const tasks: TaskList = {
 
   listPending(): Task[] {
     return this.contents.filter((task) => task.status === "pending");
+  },
+
+  save(): void {
+    const tasksJson = JSON.stringify(tasks.contents);
+    localStorage.setItem("tasks", tasksJson);
+    localStorage.setItem("nextId", nextId.toString());
+    localStorage.setItem("lastSaved", Date());
+  },
+
+  load(): void {
+    const tasksJson: string | null = localStorage.getItem("tasks");
+    if (tasksJson !== null) {
+      this.contents = JSON.parse(tasksJson) as Task[];
+    }
+  },
+
+  clear(): void {
+    this.contents = [];
+    localStorage.removeItem("tasks");
+    localStorage.removeItem("nextId");
   },
 };
 
@@ -381,6 +403,7 @@ class EditTaskFormObject extends NewTaskFormObject implements EditTaskForm {
     const priority = toPriority(this.priorityButton.textContent);
     this.task.name = name;
     this.task.priority = priority;
+    tasks.save();
     cards.editingTaskId = null;
     cards.renderAll();
     document.getElementById(`edit-task-${this.task.id}`)?.focus();
@@ -453,12 +476,21 @@ function validateTaskName(name: string): string {
       : "";
   return errorMessage;
 }
+
+function displayLastSavedDate(): void {
+  const lastSaved = localStorage.getItem("lastSaved") ?? Date();
+  const element = document.getElementById("last-saved");
+  if (element) {
+    element.textContent = `Last saved: ${lastSaved}`;
+  }
+}
+
 /* ======================================================================
  * Event Handling
  * ======================================================================
  */
 function handleToggleStatusButtonClick(task: Task): void {
-  task.toggleStatus();
+  tasks.toggleStatus(task.id);
   cards.renderAll();
 }
 
@@ -479,6 +511,14 @@ function handleDeleteButtonClick(taskId: TaskId): void {
   tasks.deleteTask(taskId);
   cards.renderAll();
 }
+
+function handleClearAllButtonClick(): void {
+  tasks.clear();
+  cards.renderAll();
+}
+
+const clearAllButton = document.getElementById("clear-all");
+clearAllButton?.addEventListener("click", handleClearAllButtonClick);
 
 /* ======================================================================
  * Rendering
@@ -513,19 +553,11 @@ const cards: CardLayout = {
     if (focusId) {
       document.getElementById(focusId)?.focus();
     }
+    displayLastSavedDate();
   },
 };
 
-/* ======================================================================
- * Create some tasks for demonstration purposes. */
-tasks.addTask("meet with CTO", 5);
-tasks.addTask("client lunch", 3, "", "lights");
-tasks.addTask("investors call");
-tasks.addTask("give keynote", 4);
-tasks.addTask("board meeting", 4);
-tasks.addTask("book flights", 2);
-/* ======================================================================
- */
-
+let nextId = +(localStorage.getItem("nextId") ?? 0);
+tasks.load();
 cards.styleRootElement();
 cards.renderAll();

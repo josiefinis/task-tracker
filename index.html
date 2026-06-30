@@ -14,8 +14,16 @@
     <script type="module" src="./dist/main.js"></script>
   </head>
 
-  <body class="flow margin-inline">
-    <h1>Task Tracker</h1>
-    <div id="app"></div>
+  <body class="flow">
+    <header class="banner | flex margin-inline">
+      <button id="clear-all" class="button">Clear All</button>
+    </header>
+    <main id="main" class="flow margin-inline">
+      <h1>Task Tracker</h1>
+      <div id="app"></div>
+    </main>
+    <footer class="margin-inline">
+      <p id="last-saved"></p>
+    </footer>
   </body>
 </html>

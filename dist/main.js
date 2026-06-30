@@ -1,17 +1,14 @@
-let counter = 0;
 class TaskObject {
     id;
     name;
     priority;
     status = "pending";
+    description;
+    notes;
     constructor(name, priority) {
-        this.id = counter++;
+        this.id = nextId++;
         this.name = name;
         this.priority = priority;
-    }
-    toggleStatus() {
-        this.status = this.status === "pending" ? "completed" : "pending";
-        return this.status;
     }
 }
 const tasks = {
@@ -26,18 +23,24 @@ const tasks = {
             task.notes = notes;
         }
         this.length = this.contents.push(task);
+        this.save();
         return this.length;
     },
     deleteTask(id) {
         const index = this.contents.findIndex((task) => task.id === id);
         this.contents.splice(index, 1);
+        this.length = this.contents.length;
+        this.save();
     },
     getTaskById(id) {
         return this.contents.find((task) => task.id === id);
     },
     toggleStatus(id) {
-        const task = this.contents.find((task) => task.id === id);
-        return task ? task.toggleStatus() : undefined;
+        const task = this.getTaskById(id);
+        if (task) {
+            task.status = task.status === "pending" ? "completed" : "pending";
+        }
+        this.save();
     },
     listAll() {
         return this.contents;
@@ -47,6 +50,23 @@ const tasks = {
     },
     listPending() {
         return this.contents.filter((task) => task.status === "pending");
+    },
+    save() {
+        const tasksJson = JSON.stringify(tasks.contents);
+        localStorage.setItem("tasks", tasksJson);
+        localStorage.setItem("nextId", nextId.toString());
+        localStorage.setItem("lastSaved", Date());
+    },
+    load() {
+        const tasksJson = localStorage.getItem("tasks");
+        if (tasksJson !== null) {
+            this.contents = JSON.parse(tasksJson);
+        }
+    },
+    clear() {
+        this.contents = [];
+        localStorage.removeItem("tasks");
+        localStorage.removeItem("nextId");
     },
 };
 class CardObject {
@@ -233,6 +253,7 @@ class EditTaskFormObject extends NewTaskFormObject {
         const priority = toPriority(this.priorityButton.textContent);
         this.task.name = name;
         this.task.priority = priority;
+        tasks.save();
         cards.editingTaskId = null;
         cards.renderAll();
         document.getElementById(`edit-task-${this.task.id}`)?.focus();
@@ -293,12 +314,19 @@ function validateTaskName(name) {
             : "";
     return errorMessage;
 }
+function displayLastSavedDate() {
+    const lastSaved = localStorage.getItem("lastSaved") ?? Date();
+    const element = document.getElementById("last-saved");
+    if (element) {
+        element.textContent = `Last saved: ${lastSaved}`;
+    }
+}
 /* ======================================================================
  * Event Handling
  * ======================================================================
  */
 function handleToggleStatusButtonClick(task) {
-    task.toggleStatus();
+    tasks.toggleStatus(task.id);
     cards.renderAll();
 }
 function handleEditTaskButtonClick(taskId) {
@@ -316,6 +344,12 @@ function handleDeleteButtonClick(taskId) {
     tasks.deleteTask(taskId);
     cards.renderAll();
 }
+function handleClearAllButtonClick() {
+    tasks.clear();
+    cards.renderAll();
+}
+const clearAllButton = document.getElementById("clear-all");
+clearAllButton?.addEventListener("click", handleClearAllButtonClick);
 const cards = {
     rootElement: document.querySelector("#app"),
     editingTaskId: null,
@@ -333,18 +367,11 @@ const cards = {
         if (focusId) {
             document.getElementById(focusId)?.focus();
         }
+        displayLastSavedDate();
     },
 };
-/* ======================================================================
- * Create some tasks for demonstration purposes. */
-tasks.addTask("meet with CTO", 5);
-tasks.addTask("client lunch", 3, "", "lights");
-tasks.addTask("investors call");
-tasks.addTask("give keynote", 4);
-tasks.addTask("board meeting", 4);
-tasks.addTask("book flights", 2);
-/* ======================================================================
- */
+let nextId = +(localStorage.getItem("nextId") ?? 0);
+tasks.load();
 cards.styleRootElement();
 cards.renderAll();
 export {};

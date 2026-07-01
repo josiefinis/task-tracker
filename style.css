@@ -147,6 +147,14 @@ input {
   }
 }
 
+button,
+input {
+  &:focus-visible {
+    background-color: var(--bg-icon-button-hover);
+    color: contrast-color(var(--bg-icon-button-hover));
+  }
+}
+
 /* ======================================================================
  * COMPOSITION
  * ======================================================================

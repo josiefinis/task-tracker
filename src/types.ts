@@ -21,14 +21,19 @@ export interface TaskList {
     description?: string,
     notes?: string,
   ): number;
+  editTask(
+    id: TaskId,
+    name: string,
+    priority?: Priority,
+    description?: string,
+    notes?: string,
+  ): void;
   deleteTask(id: TaskId): void;
   getTaskById(id: TaskId): Task | undefined;
   toggleStatus(id: TaskId): void;
   listAll(): Task[];
   listCompleted(): Task[];
   listPending(): Task[];
-  save(): void;
-  load(): void;
   clear(): void;
 }
 

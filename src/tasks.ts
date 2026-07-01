@@ -1,6 +1,7 @@
+import { loadNextId, clearStoredTasks, saveTasks } from "./local-storage.js";
 import type { Task, TaskId, Status, Priority, TaskList } from "./types.js";
 
-let nextId = +(localStorage.getItem("nextId") ?? 0);
+let nextId = loadNextId();
 
 export class TaskObject implements Task {
   id: TaskId;
@@ -35,15 +36,36 @@ export const tasks: TaskList = {
       task.notes = notes;
     }
     this.length = this.contents.push(task);
-    this.save();
+    saveTasks(this.contents, nextId);
     return this.length;
+  },
+
+  editTask(
+    id: TaskId,
+    name: string,
+    priority: Priority,
+    description?: string,
+    notes?: string,
+  ): void {
+    const task: Task = this.getTaskById(id) as Task;
+    task.name = name;
+    if (priority) {
+      task.priority = priority;
+    }
+    if (description) {
+      task.description = description;
+    }
+    if (notes) {
+      task.notes = notes;
+    }
+    saveTasks(this.contents, nextId);
   },
 
   deleteTask(id: TaskId): void {
     const index = this.contents.findIndex((task) => task.id === id);
     this.contents.splice(index, 1);
     this.length = this.contents.length;
-    this.save();
+    saveTasks(this.contents, nextId);
   },
 
   getTaskById(id: TaskId): Task | undefined {
@@ -55,7 +77,7 @@ export const tasks: TaskList = {
     if (task) {
       task.status = task.status === "pending" ? "completed" : "pending";
     }
-    this.save();
+    saveTasks(this.contents, nextId);
   },
 
   listAll(): Task[] {
@@ -70,23 +92,8 @@ export const tasks: TaskList = {
     return this.contents.filter((task) => task.status === "pending");
   },
 
-  save(): void {
-    const tasksJson = JSON.stringify(tasks.contents);
-    localStorage.setItem("tasks", tasksJson);
-    localStorage.setItem("nextId", nextId.toString());
-    localStorage.setItem("lastSaved", Date());
-  },
-
-  load(): void {
-    const tasksJson: string | null = localStorage.getItem("tasks");
-    if (tasksJson !== null) {
-      this.contents = JSON.parse(tasksJson) as Task[];
-    }
-  },
-
   clear(): void {
     this.contents = [];
-    localStorage.removeItem("tasks");
-    localStorage.removeItem("nextId");
+    clearStoredTasks();
   },
 };

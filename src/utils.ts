@@ -1,4 +1,4 @@
-import type { Priority } from "./types";
+import type { Priority } from "./types.js";
 
 export function toPriority(value: string | number): Priority {
   if ([1, 2, 3, 4, 5].includes(+value)) {

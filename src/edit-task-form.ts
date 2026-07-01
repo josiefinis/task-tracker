@@ -48,9 +48,7 @@ export class EditTaskFormObject
       return;
     }
     const priority = toPriority(this.priorityButton.textContent);
-    this.task.name = name;
-    this.task.priority = priority;
-    tasks.save();
+    tasks.editTask(this.task.id, name, priority);
     cards.editingTaskId = null;
     cards.renderAll();
     document.getElementById(`edit-task-${this.task.id}`)?.focus();

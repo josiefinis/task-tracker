@@ -1,10 +1,7 @@
-import { tasks } from "./tasks.js";
 import { cards } from "./render.js";
-/* ======================================================================
- * Render Tasks as Cards
- * ======================================================================
- */
+import { loadTasks } from "./local-storage.js";
+import { tasks } from "./tasks.js";
 
-tasks.load();
+tasks.contents = loadTasks();
 cards.styleRootElement();
 cards.renderAll();

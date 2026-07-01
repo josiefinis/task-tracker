@@ -1,6 +1,4 @@
 import type { Task, TaskId, Status, Priority, Card } from "./types.js";
-import { tasks } from "./tasks.js";
-import { cards } from "./render.js";
 
 export class CardObject implements Card {
   taskId: TaskId;
@@ -19,8 +17,6 @@ export class CardObject implements Card {
     this.priority = this.createPriorityElement(task.priority);
     this.toggleStatusButton = this.createToggleStatusButton(task);
     this.editTaskButton = this.createEditTaskButton();
-    this.addToggleStatusClickListener(task);
-    this.addEditTaskClickListener();
   }
 
   createRootElement(): HTMLElement {
@@ -74,18 +70,6 @@ export class CardObject implements Card {
     return button;
   }
 
-  addToggleStatusClickListener(task: Task): void {
-    this.toggleStatusButton.addEventListener("click", () => {
-      handleToggleStatusButtonClick(task);
-    });
-  }
-
-  addEditTaskClickListener(): void {
-    this.editTaskButton.addEventListener("click", () => {
-      handleEditTaskButtonClick(this.taskId);
-    });
-  }
-
   render(): HTMLElement {
     const rootElement = this.rootElement;
     rootElement.append(
@@ -97,15 +81,4 @@ export class CardObject implements Card {
     );
     return rootElement;
   }
-}
-
-function handleToggleStatusButtonClick(task: Task): void {
-  tasks.toggleStatus(task.id);
-  cards.renderAll();
-}
-
-function handleEditTaskButtonClick(taskId: TaskId): void {
-  cards.editingTaskId = taskId;
-  cards.renderAll();
-  document.getElementById("edit-task-name")?.focus();
 }

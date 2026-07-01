@@ -1,7 +1,5 @@
 import type { NewTaskForm, LabeledInput, Priority } from "./types.js";
-import { validateTaskName, incrementPriority, toPriority } from "./utils.js";
-import { tasks } from "./tasks.js";
-import { cards } from "./render.js";
+import { incrementPriority } from "./utils.js";
 
 export class NewTaskFormObject implements NewTaskForm {
   rootElement: HTMLFormElement;
@@ -14,10 +12,6 @@ export class NewTaskFormObject implements NewTaskForm {
     this.taskNameInput = this.createTaskNameInput();
     this.priorityButton = this.createPriorityButton();
     this.saveButton = this.createSaveButton();
-    this.addPriorityClickListener();
-    this.rootElement.addEventListener("submit", (e) => {
-      this.handleSubmit(e);
-    });
   }
 
   createRootElement(): HTMLFormElement {
@@ -54,26 +48,6 @@ export class NewTaskFormObject implements NewTaskForm {
     return button;
   }
 
-  addPriorityClickListener(): void {
-    this.priorityButton.addEventListener("click", () => {
-      handlePriorityButtonClick(this.priorityButton);
-    });
-  }
-
-  handleSubmit(event: Event): void {
-    event.preventDefault();
-    const name = this.taskNameInput.input.value.trim();
-    const errorMessage = validateTaskName(name);
-    if (errorMessage) {
-      this.taskNameInput.errorMessage.textContent = errorMessage;
-      return;
-    }
-    const priority = toPriority(this.priorityButton.textContent);
-    tasks.addTask(name, priority);
-    cards.renderAll();
-    document.getElementById("new-task-name")?.focus();
-  }
-
   render(): HTMLElement {
     const rootElement = this.rootElement;
     rootElement.append(
@@ -83,13 +57,6 @@ export class NewTaskFormObject implements NewTaskForm {
     );
     return rootElement;
   }
-}
-
-function handlePriorityButtonClick(button: HTMLButtonElement) {
-  let priority = toPriority(button.textContent);
-  priority = incrementPriority(priority);
-  button.textContent = `${priority}`;
-  button.ariaLabel = `Change priority to ${incrementPriority(priority)}`;
 }
 
 export function createButton(textContent: string): HTMLButtonElement {

@@ -1,41 +1,12 @@
+import type { Task, TaskId, Status, Priority, TaskList } from "./types.js";
+import type { Card } from "./types.js";
+import type { NewTaskForm, EditTaskForm, LabeledInput } from "./types.js";
+import type { CardLayout } from "./types.js";
+
 /* ======================================================================
  * Tasks
  * ======================================================================
  */
-type TaskId = number;
-type Priority = 1 | 2 | 3 | 4 | 5;
-type Status = "pending" | "completed";
-
-interface Task {
-  id: TaskId;
-  name: string;
-  priority: Priority;
-  status: Status;
-  description?: string;
-  notes?: string;
-}
-
-interface TaskList {
-  contents: Task[];
-  length: number;
-
-  addTask(
-    name: string,
-    priority?: Priority,
-    description?: string,
-    notes?: string,
-  ): number;
-  deleteTask(id: TaskId): void;
-  getTaskById(id: TaskId): Task | undefined;
-  toggleStatus(id: TaskId): void;
-  listAll(): Task[];
-  listCompleted(): Task[];
-  listPending(): Task[];
-  save(): void;
-  load(): void;
-  clear(): void;
-}
-
 class TaskObject implements Task {
   id: TaskId;
   name: string;
@@ -129,58 +100,6 @@ const tasks: TaskList = {
  * Render Tasks as Cards
  * ======================================================================
  */
-interface Card {
-  taskId: TaskId;
-  rootElement: HTMLElement;
-  heading: HTMLHeadingElement;
-  status: HTMLParagraphElement;
-  priority: HTMLParagraphElement;
-  toggleStatusButton: HTMLButtonElement;
-  editTaskButton: HTMLButtonElement;
-
-  createRootElement(): HTMLElement;
-  createHeadingElement(taskName: string): HTMLHeadingElement;
-  createStatusElement(taskStatus: Status): HTMLParagraphElement;
-  createPriorityElement(taskPriority: Priority): HTMLParagraphElement;
-  createToggleStatusButton(task: Task): HTMLButtonElement;
-  createEditTaskButton(): HTMLButtonElement;
-  addToggleStatusClickListener(task: Task): void;
-  addEditTaskClickListener(): void;
-  render(): HTMLElement;
-}
-
-interface NewTaskForm {
-  rootElement: HTMLFormElement;
-  taskNameInput: LabeledInput;
-  priorityButton: HTMLButtonElement;
-  saveButton: HTMLButtonElement;
-
-  createRootElement(): HTMLFormElement;
-  createTaskNameInput(): LabeledInput;
-  createPriorityButton(priority?: Priority): HTMLButtonElement;
-  createSaveButton(): HTMLButtonElement;
-  addPriorityClickListener(): void;
-  handleSubmit(event: Event): void;
-  render(): HTMLElement;
-}
-
-interface EditTaskForm extends NewTaskForm {
-  task: Task;
-  dialog: HTMLDialogElement;
-  deleteButton: HTMLButtonElement;
-
-  createDialogElement(): HTMLDialogElement;
-  createDeleteButton(): HTMLButtonElement;
-  addDeleteClickListener(): void;
-}
-
-interface LabeledInput {
-  rootElement: HTMLDivElement;
-  label: HTMLLabelElement;
-  input: HTMLInputElement;
-  errorMessage: HTMLParagraphElement;
-}
-
 class CardObject implements Card {
   taskId: TaskId;
   rootElement: HTMLElement;
@@ -524,14 +443,6 @@ clearAllButton?.addEventListener("click", handleClearAllButtonClick);
  * Rendering
  * ======================================================================
  */
-interface CardLayout {
-  rootElement: HTMLDivElement;
-  editingTaskId: TaskId | null;
-
-  styleRootElement(): void;
-  renderAll(): void;
-}
-
 const cards: CardLayout = {
   rootElement: document.querySelector("#app") as HTMLDivElement,
   editingTaskId: null,

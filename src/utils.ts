@@ -22,11 +22,3 @@ export function validateTaskName(name: string): string {
       : "";
   return errorMessage;
 }
-
-export function displayLastSavedDate(): void {
-  const lastSaved = localStorage.getItem("lastSaved") ?? Date();
-  const element = document.getElementById("last-saved");
-  if (element) {
-    element.textContent = `Last saved: ${lastSaved}`;
-  }
-}

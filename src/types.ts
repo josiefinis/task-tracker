@@ -52,8 +52,6 @@ export interface Card {
   createPriorityElement(taskPriority: Priority): HTMLParagraphElement;
   createToggleStatusButton(task: Task): HTMLButtonElement;
   createEditTaskButton(): HTMLButtonElement;
-  addToggleStatusClickListener(task: Task): void;
-  addEditTaskClickListener(): void;
   render(): HTMLElement;
 }
 
@@ -67,8 +65,6 @@ export interface NewTaskForm {
   createTaskNameInput(): LabeledInput;
   createPriorityButton(priority?: Priority): HTMLButtonElement;
   createSaveButton(): HTMLButtonElement;
-  addPriorityClickListener(): void;
-  handleSubmit(event: Event): void;
   render(): HTMLElement;
 }
 
@@ -79,7 +75,6 @@ export interface EditTaskForm extends NewTaskForm {
 
   createDialogElement(): HTMLDialogElement;
   createDeleteButton(): HTMLButtonElement;
-  addDeleteClickListener(): void;
 }
 
 export interface LabeledInput {
@@ -89,10 +84,15 @@ export interface LabeledInput {
   errorMessage: HTMLParagraphElement;
 }
 
-export interface CardLayout {
+export interface AppLayout {
   rootElement: HTMLDivElement;
   editingTaskId: TaskId | null;
 
   styleRootElement(): void;
+  renderCard(task: Task): void;
+  renderNewTaskForm(): void;
+  renderEditTaskForm(task: Task): void;
+  renderTasks(tasks: TaskList): void;
+  renderLastSavedDate(): void;
   renderAll(): void;
 }

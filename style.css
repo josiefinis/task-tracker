@@ -47,6 +47,7 @@
   /* Semantic Colors */
   --clr-accent: light-dark(var(--pink-800), var(--pink-200));
   --clr-background: light-dark(var(--pink-100), var(--pink-950));
+  --clr-bg-banner: light-dark(var(--pink-200), var(--pink-900));
   --clr-subtle-text: light-dark(var(--gray-600), var(--gray-300));
   --clr-shadow: light-dark(var(--gray-400), var(--black));
   --clr-error-message: light-dark(var(--red), var(--light-red));
@@ -139,6 +140,10 @@ p {
   text-wrap: pretty;
 }
 
+.icon {
+  background-color: oklch(0 0 0 / 0);
+}
+
 button,
 input {
   &:hover {
@@ -193,6 +198,10 @@ input {
 
 .margin-inline {
   margin-inline: clamp(1rem, 4vw, 3rem);
+}
+
+.padding-inline {
+  padding-inline: clamp(1rem, 4vw, 3rem);
 }
 
 /* ======================================================================
@@ -269,13 +278,17 @@ input {
   aspect-ratio: 1;
   border-radius: var(--border-radius);
   border: none;
-  background-color: oklch(0 0 0 / 0);
   color: var(--clr-brand);
 }
 
 .banner {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background-color: var(--clr-bg-banner);
   padding-block: calc(4 * var(--spacing));
   justify-content: end;
+  box-shadow: 0px 2px 2px var(--clr-shadow);
 
   .button {
     font-size: var(--fluid-font-size-m);
@@ -285,6 +298,7 @@ input {
 .card {
   container-type: inline-size;
   grid-template-columns: 6fr 1fr;
+  grid-template-rows: 5fr 2fr 3fr;
   position: relative;
   border-radius: var(--border-radius);
   background-color: light-dark(var(--white), var(--gray-950));
@@ -305,6 +319,7 @@ input {
 
 .card__toggle-status {
   order: 5;
+  margin-block-start: auto;
   margin-inline-start: auto;
 }
 
@@ -324,26 +339,30 @@ input {
   order: 4;
   font-size: var(--fluid-font-size-xl);
   font-weight: var(--font-weight-bold);
-  aspect-ratio: 1;
   border-radius: 50%;
   border: solid thin var(--clr-subtle-text);
   text-align: center;
+  margin-block-start: auto;
   margin-inline-end: auto;
 }
 
-.form.card {
-  opacity: 1;
-}
-
 .form {
+  grid-template-columns: 2fr 3fr 2fr;
+  grid-template-rows: 3fr 1fr;
   .priority {
-    grid-column: span 2;
+    order: 2;
+  }
+  &.edit-task {
+    grid-template-columns: 2fr 4fr 1fr;
+    .form__save {
+      grid-column: span 1;
+    }
   }
 }
 
 .form__input-group {
   order: 1;
-  grid-column: span 2;
+  grid-column: span 3;
 }
 
 .form__input {
@@ -354,12 +373,14 @@ input {
 
 .form__delete {
   order: 6;
+  margin-block-start: auto;
   margin-inline-start: auto;
 }
 
 .form__save {
   order: 5;
-  margin-inline-end: auto;
+  margin-inline-start: auto;
+  grid-column: span 2;
 }
 
 /* ======================================================================

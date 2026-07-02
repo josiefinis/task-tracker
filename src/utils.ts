@@ -16,9 +16,9 @@ export function incrementPriority(priority: Priority): Priority {
 
 export function validateTaskName(name: string): string {
   const errorMessage: string = !name
-    ? "Task name is required."
+    ? "Enter a task name."
     : name.length > 30
-      ? "Task name should be no more than 30 characters"
+      ? "Enter fewer than 30 characters."
       : "";
   return errorMessage;
 }

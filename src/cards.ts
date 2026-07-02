@@ -45,7 +45,7 @@ export class CardObject implements Card {
 
   createPriorityElement(taskPriority: Priority): HTMLParagraphElement {
     const priorityElement = document.createElement("p");
-    priorityElement.className = "priority";
+    priorityElement.className = "priority icon";
     priorityElement.textContent = `${taskPriority}`;
     priorityElement.classList.add(`priority-${taskPriority}`);
     return priorityElement;

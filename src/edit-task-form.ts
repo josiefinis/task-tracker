@@ -15,6 +15,7 @@ export class EditTaskFormObject
     this.dialog = this.createDialogElement();
     this.priorityButton = this.createPriorityButton(task.priority);
     this.deleteButton = this.createDeleteButton();
+    this.rootElement.classList.add("edit-task");
     this.taskNameInput.input.id = "edit-task-name";
     this.taskNameInput.input.value = task.name;
     this.rootElement.appendChild(this.deleteButton);

@@ -19,7 +19,7 @@ export class NewTaskFormObject {
     createTaskNameInput() {
         const input = createLabeledInput("new-task-name", "Task name");
         input.rootElement.className = "form__input-group";
-        input.input.className = "form__input task-name";
+        input.input.className = "form__input | fluid-font-size-xl";
         input.label.className = "visually-hidden";
         input.input.placeholder = "New task...";
         input.input.dataset["type"] = "dashed-border";

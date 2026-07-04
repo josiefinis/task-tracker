@@ -27,7 +27,10 @@ export class CardObject implements Card {
 
   createHeadingElement(taskName: string): HTMLHeadingElement {
     const headingElement = document.createElement("h2");
-    headingElement.className = "card__heading task-name";
+    headingElement.className = "card__heading";
+    headingElement.classList.add(
+      taskName.length > 20 ? "fluid-font-size-l" : "fluid-font-size-xl",
+    );
     headingElement.textContent = taskName;
     return headingElement;
   }

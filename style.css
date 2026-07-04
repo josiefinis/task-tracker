@@ -129,6 +129,8 @@ h6 {
   text-wrap: balance;
   line-height: 1.1;
   font-weight: var(--font-weight-bold);
+  word-break: break-word;
+  hyphens: auto;
 }
 
 h1 {
@@ -138,6 +140,8 @@ h1 {
 
 p {
   text-wrap: pretty;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .icon {
@@ -259,6 +263,13 @@ input {
   opacity: 0.5;
 }
 
+.fluid-font-size-xl {
+  font-size: var(--fluid-font-size-xl);
+}
+.fluid-font-size-l {
+  font-size: var(--fluid-font-size-l);
+}
+
 /* ======================================================================
  * BLOCKS
  * ======================================================================
@@ -299,6 +310,7 @@ input {
   container-type: inline-size;
   grid-template-columns: 6fr 1fr;
   grid-template-rows: 5fr 2fr 3fr;
+  aspect-ratio: 3/2;
   position: relative;
   border-radius: var(--border-radius);
   background-color: light-dark(var(--white), var(--gray-950));
@@ -306,11 +318,6 @@ input {
     2px 2px 2px var(--clr-shadow),
     -2px 2px 2px var(--clr-shadow);
   padding: 1rem;
-}
-
-.task-name {
-  font-size: var(--fluid-font-size-xl);
-  font-weight: var(--font-weight-bold);
 }
 
 .card__heading {
